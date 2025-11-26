@@ -16,28 +16,32 @@
         input, select, textarea { width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 6px; border: 1px solid #444; background: var(--input); color: white; box-sizing: border-box; outline: none; transition: 0.3s; }
         input:focus, select:focus, textarea:focus { border-color: var(--accent); }
         
-        /* --- Password Toggle Style (แก้ไข) --- */
-        .password-container {
-            position: relative;
-            width: 100%;
-            margin-bottom: 15px;
+        /* --- CSS สำหรับซ่อน Textarea --- */
+        .textarea-container { position: relative; width: 100%; margin-bottom: 10px; }
+        
+        /* Class นี้จะแปลงตัวหนังสือเป็นจุดดำๆ */
+        .masked {
+            -webkit-text-security: disc; /* สำหรับ Chrome, Safari, Edge */
+            text-security: disc;
         }
-        .password-container input {
-            width: 100%;
-            margin-bottom: 0; 
-            padding-right: 40px; /* เว้นที่ให้ไอคอน */
-        }
-        /* Class นี้สำคัญ ต้องตรงกับ HTML */
-        .toggle-password {
+
+        .toggle-textarea {
             position: absolute;
-            right: 15px;
-            top: 50%;
-            transform: translateY(-50%); /* จัดกึ่งกลางแนวตั้ง */
+            top: 10px;
+            right: 10px;
             cursor: pointer;
             color: #777;
-            font-size: 1rem;
-            z-index: 10; /* ดันให้อยู่บนสุด */
+            background: rgba(0,0,0,0.5); /* พื้นหลังจางๆ ให้อ่านง่าย */
+            padding: 5px;
+            border-radius: 4px;
+            font-size: 0.9rem;
         }
+        .toggle-textarea:hover { color: var(--accent); }
+
+        /* --- Password Input Toggle --- */
+        .password-container { position: relative; width: 100%; margin-bottom: 15px; }
+        .password-container input { width: 100%; margin-bottom: 0; padding-right: 40px; }
+        .toggle-password { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #777; font-size: 1rem; z-index: 10; }
         .toggle-password:hover { color: var(--accent); }
 
         .btn { width: 100%; padding: 10px; border: none; border-radius: 6px; font-weight: 500; cursor: pointer; background: var(--accent); color: #000; font-family: 'Kanit'; transition: 0.2s; }
@@ -88,7 +92,11 @@
             <input type="text" id="prof-video" placeholder="https://www.youtube.com/watch?v=..." style="border-color: #ff4757;">
 
             <label style="font-size: 0.8rem; color: #aaa;">รหัสผ่านกลุ่ม (รหัส:ชื่อกลุ่ม)</label>
-            <textarea id="prof-config" placeholder="1111:vip&#10;2222:family" style="height: 60px; font-family: monospace; border-color: #ffd700;"></textarea>
+            
+            <div class="textarea-container">
+                <textarea id="prof-config" class="masked" placeholder="1111:vip&#10;2222:family" style="height: 60px; font-family: monospace; border-color: #ffd700;"></textarea>
+                <i class="fas fa-eye toggle-textarea" id="toggleConfig" onclick="toggleConfigVisibility()"></i>
+            </div>
             
             <button class="btn" onclick="saveProfile()">บันทึกการตั้งค่า</button>
         </div>
@@ -128,7 +136,7 @@
 
     <script>
         // ------------------------------------------------------------------
-        // ⚠️ อย่าลืมใส่ Config ของคุณตรงนี้อีกรอบนะครับ!
+        // ⚠️ อย่าลืมใส่ Config ของคุณตรงนี้!
         // ------------------------------------------------------------------
         const firebaseConfig = {
             apiKey: "AIzaSyB-Brx6cQ7dFhQqbEhDG4xIT4jcVG1yogs",
@@ -160,7 +168,7 @@
             }
         });
 
-        // --- ฟังก์ชัน Toggle Password ---
+        // --- Toggle Password (Login) ---
         function togglePasswordVisibility() {
             const passwordInput = document.getElementById('password');
             const toggleIcon = document.getElementById('togglePassword');
@@ -173,6 +181,26 @@
                 passwordInput.type = 'password';
                 toggleIcon.classList.remove('fa-eye-slash');
                 toggleIcon.classList.add('fa-eye');
+            }
+        }
+
+        // --- Toggle Config Textarea (New) ---
+        function toggleConfigVisibility() {
+            const textArea = document.getElementById('prof-config');
+            const toggleIcon = document.getElementById('toggleConfig');
+            
+            if (textArea.classList.contains('masked')) {
+                // แสดงข้อความ (เอา class masked ออก)
+                textArea.classList.remove('masked');
+                toggleIcon.classList.remove('fa-eye');
+                toggleIcon.classList.add('fa-eye-slash');
+                toggleIcon.style.color = '#00d2ff'; // เปลี่ยนสีให้รู้ว่าเปิดอยู่
+            } else {
+                // ซ่อนข้อความ (ใส่ class masked)
+                textArea.classList.add('masked');
+                toggleIcon.classList.remove('fa-eye-slash');
+                toggleIcon.classList.add('fa-eye');
+                toggleIcon.style.color = '#777';
             }
         }
 
