@@ -16,29 +16,11 @@
         input, select, textarea { width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 6px; border: 1px solid #444; background: var(--input); color: white; box-sizing: border-box; outline: none; transition: 0.3s; }
         input:focus, select:focus, textarea:focus { border-color: var(--accent); }
         
-        /* --- CSS สำหรับซ่อน Textarea --- */
         .textarea-container { position: relative; width: 100%; margin-bottom: 10px; }
-        
-        /* Class นี้จะแปลงตัวหนังสือเป็นจุดดำๆ */
-        .masked {
-            -webkit-text-security: disc; /* สำหรับ Chrome, Safari, Edge */
-            text-security: disc;
-        }
-
-        .toggle-textarea {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            cursor: pointer;
-            color: #777;
-            background: rgba(0,0,0,0.5); /* พื้นหลังจางๆ ให้อ่านง่าย */
-            padding: 5px;
-            border-radius: 4px;
-            font-size: 0.9rem;
-        }
+        .masked { -webkit-text-security: disc; text-security: disc; }
+        .toggle-textarea { position: absolute; top: 10px; right: 10px; cursor: pointer; color: #777; background: rgba(0,0,0,0.5); padding: 5px; border-radius: 4px; font-size: 0.9rem; }
         .toggle-textarea:hover { color: var(--accent); }
 
-        /* --- Password Input Toggle --- */
         .password-container { position: relative; width: 100%; margin-bottom: 15px; }
         .password-container input { width: 100%; margin-bottom: 0; padding-right: 40px; }
         .toggle-password { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #777; font-size: 1rem; z-index: 10; }
@@ -63,14 +45,11 @@
     <div id="login-screen" class="wrapper" style="margin-top: 10vh;">
         <div class="card" style="text-align: center;">
             <h1 style="color:white; margin-bottom:20px;">🔒 Admin</h1>
-            
             <input type="email" id="email" placeholder="Email" style="margin-bottom: 15px;">
-            
             <div class="password-container">
                 <input type="password" id="password" placeholder="Password">
                 <i class="fas fa-eye toggle-password" id="togglePassword" onclick="togglePasswordVisibility()"></i>
             </div>
-
             <button class="btn" onclick="login()">Login</button>
             <p id="login-error" style="color: #ff4757; font-size: 0.9rem; margin-top: 10px;"></p>
         </div>
@@ -92,12 +71,10 @@
             <input type="text" id="prof-video" placeholder="https://www.youtube.com/watch?v=..." style="border-color: #ff4757;">
 
             <label style="font-size: 0.8rem; color: #aaa;">รหัสผ่านกลุ่ม (รหัส:ชื่อกลุ่ม)</label>
-            
             <div class="textarea-container">
                 <textarea id="prof-config" class="masked" placeholder="1111:vip&#10;2222:family" style="height: 60px; font-family: monospace; border-color: #ffd700;"></textarea>
                 <i class="fas fa-eye toggle-textarea" id="toggleConfig" onclick="toggleConfigVisibility()"></i>
             </div>
-            
             <button class="btn" onclick="saveProfile()">บันทึกการตั้งค่า</button>
         </div>
 
@@ -120,7 +97,7 @@
                     <option value="fab fa-github">😺 GitHub</option>
                     <option value="fas fa-envelope">✉️ Email</option>
                 </select>
-                <input type="text" id="linkGroup" placeholder="กลุ่มสิทธิ์ (ว่าง=Public)" style="flex: 1;">
+                <input type="text" id="linkGroup" placeholder="กลุ่มสิทธิ์ (เช่น vip, family)" style="flex: 1;">
             </div>
 
             <button class="btn" id="save-btn" onclick="saveLink()">เพิ่มลิงก์</button>
@@ -135,9 +112,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
 
     <script>
-        // ------------------------------------------------------------------
-        // ⚠️ อย่าลืมใส่ Config ของคุณตรงนี้!
-        // ------------------------------------------------------------------
+        // ⚠️ ใส่ Config เดิม
         const firebaseConfig = {
             apiKey: "AIzaSyB-Brx6cQ7dFhQqbEhDG4xIT4jcVG1yogs",
   authDomain: "mylinks-web.firebaseapp.com",
@@ -146,7 +121,6 @@
   messagingSenderId: "702413304222",
   appId: "1:702413304222:web:d255e6c2f428bb1e1d668f",
         };
-        // ------------------------------------------------------------------
 
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
@@ -168,11 +142,9 @@
             }
         });
 
-        // --- Toggle Password (Login) ---
         function togglePasswordVisibility() {
             const passwordInput = document.getElementById('password');
             const toggleIcon = document.getElementById('togglePassword');
-            
             if (passwordInput.type === 'password') {
                 passwordInput.type = 'text';
                 toggleIcon.classList.remove('fa-eye');
@@ -184,19 +156,15 @@
             }
         }
 
-        // --- Toggle Config Textarea (New) ---
         function toggleConfigVisibility() {
             const textArea = document.getElementById('prof-config');
             const toggleIcon = document.getElementById('toggleConfig');
-            
             if (textArea.classList.contains('masked')) {
-                // แสดงข้อความ (เอา class masked ออก)
                 textArea.classList.remove('masked');
                 toggleIcon.classList.remove('fa-eye');
                 toggleIcon.classList.add('fa-eye-slash');
-                toggleIcon.style.color = '#00d2ff'; // เปลี่ยนสีให้รู้ว่าเปิดอยู่
+                toggleIcon.style.color = '#00d2ff';
             } else {
-                // ซ่อนข้อความ (ใส่ class masked)
                 textArea.classList.add('masked');
                 toggleIcon.classList.remove('fa-eye-slash');
                 toggleIcon.classList.add('fa-eye');
