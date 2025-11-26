@@ -26,7 +26,7 @@
         }
 
         /* Profile */
-        .profile-section { text-align: center; margin-bottom: 35px; animation: fadeIn 0.8s ease; }
+        .profile-section { text-align: center; margin-bottom: 20px; animation: fadeIn 0.8s ease; }
         .profile-img {
             width: 120px; height: 120px; border-radius: 50%;
             border: 3px solid var(--accent); padding: 4px; object-fit: cover;
@@ -34,6 +34,23 @@
         }
         h1 { margin: 0; font-size: 1.8rem; font-weight: 600; }
         p.bio { opacity: 0.7; margin-top: 5px; font-weight: 300; font-size: 0.95rem; }
+
+        /* Video Container (Youtube) */
+        .video-container {
+            width: 100%; max-width: 500px; margin-bottom: 25px;
+            display: none; /* ซ่อนก่อน ถ้าไม่มีคลิป */
+            animation: fadeIn 1s ease;
+        }
+        .video-wrapper {
+            position: relative; padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+            height: 0; overflow: hidden; border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            background: #000;
+        }
+        .video-wrapper iframe {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        }
 
         /* Links Container */
         .container { width: 100%; max-width: 500px; padding-bottom: 60px; display: flex; flex-direction: column; gap: 14px; }
@@ -56,32 +73,32 @@
             border-color: rgba(255,255,255,0.5);
         }
 
-        /* --- Real Brand Icons Colors --- */
-        .link-icon { font-size: 1.6rem; margin-right: 18px; width: 35px; text-align: center; transition: 0.3s; }
-        
-        /* Brand Specific Colors */
-        .fa-facebook { color: #1877F2; }
-        .fa-youtube { color: #FF0000; }
-        .fa-instagram { color: #E4405F; }
-        .fa-line { color: #00C300; }
-        .fa-tiktok { color: #ff0050; filter: drop-shadow(2px 2px 0px #00f2ea); }
-        .fa-google-drive { color: #1FA463; } /* Drive Green */
-        .fa-github { color: #ffffff; }
-        .fa-envelope { color: #FFC107; }
-        .fa-link { color: var(--accent); }
-
-        .link-text { font-size: 1.05rem; font-weight: 500; }
-        
-        /* Badges */
-        .badge {
-            margin-left: auto; font-size: 0.75rem;
-            padding: 4px 10px; border-radius: 20px;
-            font-weight: 600; text-transform: uppercase;
+        /* Link Styles */
+        .link-card.special-access {
+            background: rgba(0, 210, 255, 0.15);
+            border-color: var(--accent);
+            box-shadow: 0 0 15px rgba(0, 210, 255, 0.2);
         }
-        .badge-vip { background: linear-gradient(45deg, #FFD700, #FFA500); color: #000; }
-        .badge-private { background: rgba(255,255,255,0.2); color: #fff; }
+        .group-divider {
+            display: flex; align-items: center; color: var(--accent);
+            font-size: 0.9rem; margin: 10px 0 5px 0; font-weight: 500;
+        }
+        .group-divider::before, .group-divider::after {
+            content: ''; flex: 1; height: 1px; background: rgba(255,255,255,0.2);
+        }
+        .group-divider span { padding: 0 10px; }
 
-        /* Unlock Button */
+        /* Icons */
+        .link-icon { font-size: 1.6rem; margin-right: 18px; width: 35px; text-align: center; }
+        .fa-facebook { color: #1877F2; } .fa-youtube { color: #FF0000; } .fa-instagram { color: #E4405F; }
+        .fa-line { color: #00C300; } .fa-tiktok { color: #ff0050; filter: drop-shadow(2px 2px 0px #00f2ea); }
+        .fa-google-drive { color: #1FA463; } .fa-github { color: #ffffff; } .fa-envelope { color: #FFC107; }
+        .fa-link { color: var(--accent); }
+        .link-text { font-size: 1.05rem; font-weight: 500; }
+        .badge { margin-left: auto; font-size: 0.75rem; padding: 4px 10px; border-radius: 20px; font-weight: 600; text-transform: uppercase; }
+        .badge-vip { background: linear-gradient(45deg, #FFD700, #FFA500); color: #000; }
+
+        /* Unlock Btn */
         .unlock-btn {
             position: fixed; bottom: 20px; right: 20px;
             background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(5px);
@@ -91,14 +108,20 @@
             cursor: pointer; transition: 0.3s; z-index: 100;
         }
         .unlock-btn.active { color: #00d2ff; border-color: #00d2ff; background: rgba(0, 210, 255, 0.1); }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .admin-link { margin-top: auto; color: rgba(255,255,255,0.2); text-decoration: none; font-size: 0.8rem; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
     <div class="profile-section" id="profile-section"></div>
+
+    <div class="video-container" id="featured-video">
+        <div class="video-wrapper">
+            <iframe id="youtube-iframe" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+    </div>
+
     <div class="container" id="links-container">
         <div style="text-align: center; opacity: 0.5;">กำลังโหลด...</div>
     </div>
@@ -113,7 +136,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
 
     <script>
-        // ⚠️ ใส่ Config ของคุณที่นี่
+        // ⚠️ ใส่ Config เดิมของคุณ
         const firebaseConfig = {
             apiKey: "AIzaSyB-Brx6cQ7dFhQqbEhDG4xIT4jcVG1yogs",
   authDomain: "mylinks-web.firebaseapp.com",
@@ -126,18 +149,16 @@
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        let currentAccessGroup = 'public'; // เริ่มต้นเห็นแค่ Public
-        let accessRules = {}; // เก็บกฎรหัสผ่าน { "1234": "vip", "5555": "family" }
+        let currentAccessGroup = 'public';
+        let accessRules = {};
 
         function loadData() {
-            // 1. โหลด Profile และ Access Rules
             db.doc("settings/profile").get().then((doc) => {
                 if (doc.exists) {
                     const data = doc.data();
                     renderProfile(data);
-                    
-                    // แปลง String การตั้งค่าให้เป็น Object
-                    // รูปแบบใน DB: "1234:vip\n5678:family"
+                    renderVideo(data.featuredVideo); // เพิ่มการเรนเดอร์วิดีโอ
+
                     if (data.accessConfig) {
                         data.accessConfig.split('\n').forEach(line => {
                             const [code, group] = line.split(':');
@@ -147,7 +168,6 @@
                 }
             });
 
-            // 2. โหลด Links (เรียงตาม Order)
             db.collection("links").orderBy("order", "asc").get().then((snapshot) => {
                 const container = document.getElementById('links-container');
                 container.innerHTML = ''; 
@@ -157,10 +177,25 @@
                     return;
                 }
 
-                snapshot.forEach((doc) => {
-                    const link = doc.data();
-                    renderLink(container, link);
+                let allLinks = [];
+                snapshot.forEach(doc => allLinks.push(doc.data()));
+
+                const visibleLinks = allLinks.filter(link => {
+                    const linkGroup = link.group || 'public';
+                    return linkGroup === 'public' || linkGroup === currentAccessGroup;
                 });
+
+                const specialLinks = visibleLinks.filter(link => link.group === currentAccessGroup && currentAccessGroup !== 'public');
+                const publicLinks = visibleLinks.filter(link => !link.group || link.group === 'public');
+
+                if (specialLinks.length > 0) {
+                    container.innerHTML += `<div class="group-divider"><span>🔓 สิทธิ์พิเศษ: ${currentAccessGroup.toUpperCase()}</span></div>`;
+                    specialLinks.forEach(link => renderLink(container, link, true));
+                }
+                if (publicLinks.length > 0) {
+                    if (specialLinks.length > 0) container.innerHTML += `<div class="group-divider"><span>🌍 ลิงก์สาธารณะ</span></div>`;
+                    publicLinks.forEach(link => renderLink(container, link, false));
+                }
             });
         }
 
@@ -172,22 +207,38 @@
             `;
         }
 
-        function renderLink(container, link) {
-            // Logic การกรองสิทธิ์
-            const linkGroup = link.group || 'public';
+        // ฟังก์ชันแสดงวิดีโอ
+        function renderVideo(url) {
+            const videoContainer = document.getElementById('featured-video');
+            const iframe = document.getElementById('youtube-iframe');
             
-            // ถ้าลิงก์ไม่ใช่ Public และ สิทธิ์ปัจจุบันของเราไม่ตรงกับกลุ่มของลิงก์ -> ไม่แสดง
-            if (linkGroup !== 'public' && linkGroup !== currentAccessGroup) return;
-
-            const iconClass = link.icon || 'fas fa-link';
-            let badge = '';
-            
-            if (linkGroup !== 'public') {
-                badge = `<span class="badge badge-vip">${linkGroup}</span>`;
+            if (url) {
+                const videoId = extractVideoID(url);
+                if (videoId) {
+                    iframe.src = `https://www.youtube.com/embed/${videoId}`;
+                    videoContainer.style.display = 'block';
+                } else {
+                    videoContainer.style.display = 'none';
+                }
+            } else {
+                videoContainer.style.display = 'none';
             }
+        }
+
+        // ฟังก์ชันช่วยดึง ID จากลิงก์ Youtube
+        function extractVideoID(url) {
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+            const match = url.match(regExp);
+            return (match && match[2].length === 11) ? match[2] : null;
+        }
+
+        function renderLink(container, link, isSpecial) {
+            const iconClass = link.icon || 'fas fa-link';
+            const specialClass = isSpecial ? 'special-access' : '';
+            const badge = isSpecial ? `<span class="badge badge-vip">${link.group}</span>` : '';
 
             const html = `
-                <a href="${link.url}" target="_blank" class="link-card">
+                <a href="${link.url}" target="_blank" class="link-card ${specialClass}">
                     <div class="link-icon"><i class="${iconClass}"></i></div>
                     <div class="link-text">${link.title}</div>
                     ${badge}
@@ -198,21 +249,18 @@
 
         function handleUnlock() {
             if (currentAccessGroup !== 'public') {
-                // Logout (กลับไปเป็น public)
                 currentAccessGroup = 'public';
                 alert("🔒 ล็อคระบบแล้ว");
                 document.getElementById('unlockBtn').classList.remove('active');
                 document.getElementById('unlockBtn').innerHTML = '<i class="fas fa-lock"></i>';
-                loadData(); // โหลดใหม่
+                loadData();
             } else {
-                // Login
                 const input = prompt("🔑 กรุณาใส่รหัสผ่านเข้าถึง:");
                 if (input && accessRules[input]) {
-                    currentAccessGroup = accessRules[input]; // ได้สิทธิ์ตามรหัสที่ใส่
-                    alert(`🔓 ยินดีต้อนรับกลุ่ม: ${currentAccessGroup.toUpperCase()}`);
+                    currentAccessGroup = accessRules[input];
                     document.getElementById('unlockBtn').classList.add('active');
                     document.getElementById('unlockBtn').innerHTML = '<i class="fas fa-unlock"></i>';
-                    loadData(); // โหลดใหม่
+                    loadData();
                 } else if (input) {
                     alert("❌ รหัสไม่ถูกต้อง");
                 }
