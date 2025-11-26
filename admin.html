@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Manage Links</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* (ใช้ CSS Theme เดียวกันกับหน้าบ้านแต่ปรับแต่งนิดหน่อย) */
+        :root { --bg-color: #1a1a1a; --text: #fff; --accent: #00d2ff; }
+        body { font-family: 'Kanit', sans-serif; background: #111; color: var(--text); padding: 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+        
+        .container { width: 100%; max-width: 500px; background: #222; padding: 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        h2 { text-align: center; margin-top: 0; color: var(--accent); }
+        input, button, select { width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 8px; border: 1px solid #444; background: #333; color: white; font-family: 'Kanit'; box-sizing: border-box; }
+        button { background: var(--accent); color: #000; font-weight: bold; cursor: pointer; border: none; transition: 0.3s; }
+        button:hover { filter: brightness(1.1); }
+        .btn-delete { background: #ff4757; color: white; width: auto; padding: 5px 10px; margin: 0; font-size: 0.8rem; }
+        
+        .link-item { display: flex; justify-content: space-between; align-items: center; background: #2a2a2a; padding: 10px; margin-bottom: 10px; border-radius: 8px; border-left: 4px solid var(--accent); }
+        .link-info { display: flex; flex-direction: column; }
+        .link-url { font-size: 0.8rem; color: #888; }
+        
+        #login-screen, #admin-screen { display: none; } /* ซ่อนไว้ก่อน */
+    </style>
+</head>
+<body>
+
+    <div id="login-screen" class="container">
+        <h2>🔒 เข้าสู่ระบบหลังบ้าน</h2>
+        <input type="email" id="email" placeholder="Email (ผู้ดูแล)">
+        <input type="password" id="password" placeholder="Password">
+        <button onclick="login()">เข้าสู่ระบบ</button>
+        <p id="login-error" style="color: red; text-align: center; font-size: 0.9rem;"></p>
+    </div>
+
+    <div id="admin-screen" class="container">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h2>⚙️ จัดการลิงก์</h2>
+            <button onclick="logout()" style="width: auto; background: #444; color: white; font-size: 0.8rem;">Log Out</button>
+        </div>
+        
+        <div style="border-top: 1px solid #444; margin: 20px 0;"></div>
+
+        <h3>เพิ่มลิงก์ใหม่</h3>
+        <input type="text" id="linkTitle" placeholder="ชื่อปุ่ม (เช่น Facebook ของฉัน)">
+        <input type="text" id="linkUrl" placeholder="ลิงก์ (เช่น https://facebook.com/...)">
+        
+        <select id="linkIcon">
+            <option value="fas fa-link">🔗 ไอคอนทั่วไป</option>
+            <option value="fab fa-facebook">📘 Facebook</option>
+            <option value="fab fa-youtube">🟥 YouTube</option>
+            <option value="fab fa-instagram">📸 Instagram</option>
+            <option value="fab fa-tiktok">🎵 TikTok</option>
+            <option value="fab fa-line">💬 LINE</option>
+            <option value="fab fa-github">😺 GitHub</option>
+        </select>
+
+        <button onclick="addLink()">บันทึกข้อมูล</button>
+
+        <div style="border-top: 1px solid #444; margin: 30px 0;"></div>
+
+        <h3>รายการปัจจุบัน</h3>
+        <div id="links-list">กำลังโหลด...</div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+
+    <script>
+        // ---------------------------------------------------------
+        // ⚠️ ใส่ Config เดียวกันกับหน้า index.html
+        // ---------------------------------------------------------
+        const firebaseConfig = {
+            apiKey: "AIzaSy...",
+            authDomain: "...",
+            projectId: "...",
+            storageBucket: "...",
+            messagingSenderId: "...",
+            appId: "..."
+        };
+        // ---------------------------------------------------------
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        const loginScreen = document.getElementById('login-screen');
+        const adminScreen = document.getElementById('admin-screen');
+
+        // ตรวจสอบสถานะ Login
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                // ถ้า Login แล้ว
+                loginScreen.style.display = 'none';
+                adminScreen.style.display = 'block';
+                loadLinks();
+            } else {
+                // ถ้ายังไม่ Login
+                loginScreen.style.display = 'block';
+                adminScreen.style.display = 'none';
+            }
+        });
+
+        // ฟังก์ชัน Login
+        function login() {
+            const email = document.getElementById('email').value;
+            const pass = document.getElementById('password').value;
+            auth.signInWithEmailAndPassword(email, pass).catch(err => {
+                document.getElementById('login-error').innerText = "อีเมลหรือรหัสผ่านไม่ถูกต้อง (" + err.message + ")";
+            });
+        }
+
+        // ฟังก์ชัน Logout
+        function logout() {
+            auth.signOut();
+        }
+
+        // ฟังก์ชันเพิ่มลิงก์
+        function addLink() {
+            const title = document.getElementById('linkTitle').value;
+            const url = document.getElementById('linkUrl').value;
+            const icon = document.getElementById('linkIcon').value;
+
+            if(!title || !url) return alert('กรุณากรอกข้อมูลให้ครบ');
+
+            db.collection('links').add({
+                title: title,
+                url: url,
+                icon: icon,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            }).then(() => {
+                alert('เพิ่มลิงก์เรียบร้อย!');
+                document.getElementById('linkTitle').value = '';
+                document.getElementById('linkUrl').value = '';
+                loadLinks(); // โหลดรายการใหม่
+            });
+        }
+
+        // ฟังก์ชันโหลดรายการลิงก์
+        function loadLinks() {
+            const listDiv = document.getElementById('links-list');
+            listDiv.innerHTML = 'กำลังโหลด...';
+
+            db.collection("links").orderBy("createdAt", "desc").get().then((snapshot) => {
+                listDiv.innerHTML = '';
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    listDiv.innerHTML += `
+                        <div class="link-item">
+                            <div class="link-info">
+                                <strong>${data.title}</strong>
+                                <span class="link-url">${data.url}</span>
+                            </div>
+                            <button class="btn-delete" onclick="deleteLink('${doc.id}')">ลบ</button>
+                        </div>
+                    `;
+                });
+            });
+        }
+
+        // ฟังก์ชันลบลิงก์
+        function deleteLink(id) {
+            if(confirm('ต้องการลบลิงก์นี้ใช่ไหม?')) {
+                db.collection('links').doc(id).delete().then(() => {
+                    loadLinks();
+                });
+            }
+        }
+    </script>
+</body>
+</html>
