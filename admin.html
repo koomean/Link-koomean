@@ -10,26 +10,19 @@
         :root { --bg: #121212; --panel: #1e1e1e; --input: #2c2c2c; --accent: #00d2ff; --text: #e0e0e0; }
         body { font-family: 'Kanit', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 20px; }
         .wrapper { width: 100%; max-width: 600px; }
-        
         .card { background: var(--panel); border-radius: 12px; padding: 20px; margin-bottom: 20px; border: 1px solid #333; }
         h3 { margin: 0 0 15px 0; color: var(--accent); border-left: 3px solid var(--accent); padding-left: 10px; font-size: 1.1rem; }
-        
         input, select, textarea { width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 6px; border: 1px solid #444; background: var(--input); color: white; box-sizing: border-box; outline: none; }
         input:focus { border-color: var(--accent); }
-        
         .btn { width: 100%; padding: 10px; border: none; border-radius: 6px; font-weight: 500; cursor: pointer; background: var(--accent); color: #000; font-family: 'Kanit'; transition: 0.2s; }
         .btn:hover { filter: brightness(1.1); }
         .btn-green { background: #2ecc71; color: white; }
-        
-        /* Link Item Style */
         .link-item { background: #252525; padding: 10px; margin-bottom: 8px; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; border-left: 4px solid #444; }
         .link-content { flex-grow: 1; margin-left: 10px; }
         .link-actions { display: flex; gap: 5px; }
         .btn-icon { background: #333; color: #aaa; width: 32px; height: 32px; border: none; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
         .btn-icon:hover { background: #444; color: white; }
         .btn-del { background: rgba(255, 71, 87, 0.1); color: #ff4757; }
-        .btn-del:hover { background: #ff4757; color: white; }
-
         #login-screen, #admin-screen { display: none; }
     </style>
 </head>
@@ -52,21 +45,26 @@
         </div>
 
         <div class="card">
-            <h3>👤 โปรไฟล์ & รหัสเข้าถึง</h3>
-            <input type="text" id="prof-img" placeholder="URL รูปภาพ">
+            <h3>👤 โปรไฟล์ & คลิปแนะนำ</h3>
+            <input type="text" id="prof-img" placeholder="URL รูปโปรไฟล์">
             <input type="text" id="prof-name" placeholder="ชื่อ">
             <textarea id="prof-bio" placeholder="Bio..." style="height: 60px;"></textarea>
             
-            <label style="font-size: 0.8rem; color: #aaa;">ตั้งรหัสผ่านกลุ่ม (รูปแบบ: รหัส:ชื่อกลุ่ม)</label>
-            <textarea id="prof-config" placeholder="ตัวอย่าง:&#10;1111:vip&#10;2222:family" style="height: 80px; font-family: monospace; border-color: #ffd700;"></textarea>
+            <label style="font-size: 0.9rem; color: #ff4757;"><i class="fab fa-youtube"></i> คลิป Youtube แนะนำตัว</label>
+            <input type="text" id="prof-video" placeholder="https://www.youtube.com/watch?v=..." style="border-color: #ff4757;">
+
+            <label style="font-size: 0.8rem; color: #aaa;">รหัสผ่านกลุ่ม (รหัส:ชื่อกลุ่ม)</label>
+            <textarea id="prof-config" placeholder="1111:vip&#10;2222:family" style="height: 60px; font-family: monospace; border-color: #ffd700;"></textarea>
             
             <button class="btn" onclick="saveProfile()">บันทึกการตั้งค่า</button>
         </div>
 
         <div class="card">
             <h3 id="form-title">➕ เพิ่มลิงก์ใหม่</h3>
-            <input type="hidden" id="link-id"> <input type="text" id="linkTitle" placeholder="ชื่อปุ่ม">
-            <input type="text" id="linkUrl" placeholder="URL (Google Drive, YouTube...)">
+            <input type="hidden" id="link-id">
+            
+            <input type="text" id="linkTitle" placeholder="ชื่อปุ่ม">
+            <input type="text" id="linkUrl" placeholder="URL">
             
             <div style="display: flex; gap: 10px;">
                 <select id="linkIcon" style="flex: 1;">
@@ -80,7 +78,6 @@
                     <option value="fab fa-github">😺 GitHub</option>
                     <option value="fas fa-envelope">✉️ Email</option>
                 </select>
-                
                 <input type="text" id="linkGroup" placeholder="กลุ่มสิทธิ์ (ว่าง=Public)" style="flex: 1;">
             </div>
 
@@ -110,10 +107,9 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        // UI Refs
         const loginScreen = document.getElementById('login-screen');
         const adminScreen = document.getElementById('admin-screen');
-        let allLinks = []; // เก็บลิงก์ในตัวแปรเพื่อใช้เรียงลำดับ
+        let allLinks = [];
 
         auth.onAuthStateChanged((user) => {
             if (user) {
@@ -134,7 +130,6 @@
         }
         function logout() { auth.signOut(); }
 
-        // --- Profile ---
         function loadProfile() {
             db.doc("settings/profile").get().then((doc) => {
                 if(doc.exists) {
@@ -142,33 +137,31 @@
                     document.getElementById('prof-img').value = d.imageUrl || '';
                     document.getElementById('prof-name').value = d.name || '';
                     document.getElementById('prof-bio').value = d.bio || '';
+                    document.getElementById('prof-video').value = d.featuredVideo || ''; // โหลดลิงก์วิดีโอ
                     document.getElementById('prof-config').value = d.accessConfig || '';
                 }
             });
         }
+
         function saveProfile() {
             db.doc("settings/profile").set({
                 imageUrl: document.getElementById('prof-img').value,
                 name: document.getElementById('prof-name').value,
                 bio: document.getElementById('prof-bio').value,
+                featuredVideo: document.getElementById('prof-video').value, // บันทึกลิงก์วิดีโอ
                 accessConfig: document.getElementById('prof-config').value
             }, { merge: true }).then(() => alert('✅ Saved!'));
         }
 
-        // --- Links CRUD & Reorder ---
         function loadLinks() {
             db.collection("links").orderBy("order", "asc").get().then((snapshot) => {
                 allLinks = [];
                 const listDiv = document.getElementById('links-list');
                 listDiv.innerHTML = '';
-                
-                snapshot.forEach(doc => {
-                    allLinks.push({ id: doc.id, ...doc.data() });
-                });
+                snapshot.forEach(doc => allLinks.push({ id: doc.id, ...doc.data() }));
 
                 allLinks.forEach((link, index) => {
                     const groupLabel = link.group && link.group !== 'public' ? `<span style="color:#ffd700; font-size:0.8rem;">[${link.group}]</span>` : '';
-                    
                     listDiv.innerHTML += `
                         <div class="link-item">
                             <div class="link-actions" style="flex-direction: column; gap: 2px;">
@@ -198,22 +191,13 @@
             if (!group) group = 'public';
 
             if(!title || !url) return alert('กรอกข้อมูลให้ครบ');
-
             const data = { title, url, icon, group };
 
             if (id) {
-                // Update
-                db.collection('links').doc(id).update(data).then(() => {
-                    resetForm();
-                    loadLinks();
-                });
+                db.collection('links').doc(id).update(data).then(() => { resetForm(); loadLinks(); });
             } else {
-                // Add New (ต้องหา order สุดท้ายก่อน)
                 const newOrder = allLinks.length > 0 ? allLinks[allLinks.length - 1].order + 1 : 1;
-                db.collection('links').add({ ...data, order: newOrder }).then(() => {
-                    resetForm();
-                    loadLinks();
-                });
+                db.collection('links').add({ ...data, order: newOrder }).then(() => { resetForm(); loadLinks(); });
             }
         }
 
@@ -239,7 +223,6 @@
             document.getElementById('linkTitle').value = '';
             document.getElementById('linkUrl').value = '';
             document.getElementById('linkGroup').value = '';
-            
             document.getElementById('form-title').innerText = '➕ เพิ่มลิงก์ใหม่';
             document.getElementById('save-btn').innerText = 'เพิ่มลิงก์';
             document.getElementById('save-btn').classList.remove('btn-green');
@@ -248,16 +231,11 @@
 
         function moveLink(index, direction) {
             if (index + direction < 0 || index + direction >= allLinks.length) return;
-
             const currentLink = allLinks[index];
             const swapLink = allLinks[index + direction];
-
-            // สลับค่า Order
             const tempOrder = currentLink.order;
             currentLink.order = swapLink.order;
             swapLink.order = tempOrder;
-
-            // อัปเดต Firestore ทั้งคู่
             Promise.all([
                 db.collection('links').doc(currentLink.id).update({ order: currentLink.order }),
                 db.collection('links').doc(swapLink.id).update({ order: swapLink.order })
