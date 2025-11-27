@@ -27,7 +27,6 @@
             padding-bottom: 40px;
         }
 
-        /* Navbar */
         .navbar {
             position: fixed; top: 0; left: 0; width: 100%; height: var(--navbar-height);
             background: rgba(15, 12, 41, 0.85); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
@@ -52,7 +51,6 @@
         }
         .nav-profile-img:hover { transform: scale(1.1); border-color: var(--accent); }
 
-        /* Profile */
         .profile-section { text-align: center; margin-bottom: 25px; animation: fadeIn 0.8s ease; }
         .profile-img {
             width: 120px; height: 120px; border-radius: 50%;
@@ -143,7 +141,7 @@
     <script>
         // ⚠️ ใส่ Config ของคุณที่นี่
         const firebaseConfig = {
-            apiKey: "AIzaSyB-Brx6cQ7dFhQqbEhDG4xIT4jcVG1yogs",
+            apiKey: "ใส่_API_KEY_ของคุณ",
             authDomain: "mylinks-web.firebaseapp.com",
             projectId: "mylinks-web",
             storageBucket: "mylinks-web.firebasestorage.app",
@@ -157,26 +155,43 @@
 
         let currentAccessGroup = 'public';
         let accessRules = {};
-        let adminProfileImage = ''; // เก็บตัวแปรรูป Admin ที่โหลดมา
+        let adminProfileImage = ''; // รูป default ของ admin
+        let userImagesMap = {}; // เก็บข้อมูลจับคู่ Email:รูปภาพ
 
-        // โหลดข้อมูลจาก DB ก่อนเพื่อเอา Navbar Image
+        // โหลดข้อมูลก่อน
         function loadData() {
             db.doc("settings/profile").get().then((doc) => {
                 if (doc.exists) {
                     const data = doc.data();
                     renderProfile(data);
                     renderVideo(data.featuredVideo);
-                    adminProfileImage = data.navbarAdminImage; // จำค่าไว้ใช้ตอน Auth Check
                     
-                    // เรียกตรวจสอบ Auth อีกครั้งเผื่อข้อมูลโหลดช้า
-                    checkAuthStatus(); 
+                    adminProfileImage = data.navbarAdminImage; // จำรูป default
+                    
+                    // แปลงข้อความ config รูปภาพรายคน ให้เป็น Object map
+                    // รูปแบบใน DB: "ploy@gmail.com:http://img.jpg\nadmin@test.com:http://..."
+                    if (data.userImagesConfig) {
+                        data.userImagesConfig.split('\n').forEach(line => {
+                            // ใช้ indexOf เพื่อเเยกอีเมลกับ url (เผื่อ url มี colon)
+                            const splitIndex = line.indexOf(':');
+                            if (splitIndex > 0) {
+                                const email = line.substring(0, splitIndex).trim();
+                                const url = line.substring(splitIndex + 1).trim();
+                                if(email && url) userImagesMap[email] = url;
+                            }
+                        });
+                    }
 
+                    // โหลด config รหัสผ่านกลุ่ม
                     if (data.accessConfig) {
                         data.accessConfig.split('\n').forEach(line => {
                             const [code, group] = line.split(':');
                             if(code && group) accessRules[code.trim()] = group.trim();
                         });
                     }
+
+                    // เช็ค Auth อีกทีหลังจากโหลด config เสร็จ เพื่ออัปเดตรูป
+                    checkAuthStatus();
                 }
             });
 
@@ -220,7 +235,6 @@
             });
         }
 
-        // Check Auth State
         function checkAuthStatus() {
             const user = auth.currentUser;
             updateNavbarUI(user);
@@ -230,19 +244,28 @@
             updateNavbarUI(user);
         });
 
+        // --- ฟังก์ชันอัปเดตรูป Navbar (Logic ที่สำคัญที่สุด) ---
         function updateNavbarUI(user) {
             const navImg = document.getElementById('nav-profile-img');
             
             if (user) {
-                // --- กรณีเป็น Admin ---
-                // ใช้รูปที่ตั้งค่าใน Admin Panel ถ้ามี, ถ้าไม่มีให้สร้าง Avatar จากชื่อ
-                const finalImg = adminProfileImage || `https://ui-avatars.com/api/?name=${user.email}&background=random`;
+                // 1. เช็คว่ามีรูปเฉพาะเจาะจงสำหรับอีเมลนี้ไหม (จาก Config ที่ตั้งใน Admin)
+                if (userImagesMap[user.email]) {
+                    navImg.src = userImagesMap[user.email];
+                } 
+                // 2. ถ้าไม่มี ให้ใช้รูป Admin ทั่วไป (จาก Config)
+                else if (adminProfileImage) {
+                    navImg.src = adminProfileImage;
+                } 
+                // 3. ถ้าไม่มีอีก ให้ใช้รูปจาก Google Auth หรือรูปสุ่ม
+                else {
+                    navImg.src = user.photoURL || `https://ui-avatars.com/api/?name=${user.email}&background=random`;
+                }
                 
-                navImg.src = finalImg;
-                navImg.title = "Admin: " + user.email;
-                navImg.style.borderColor = "#00d2ff";
+                navImg.title = "User: " + user.email;
+                navImg.style.borderColor = "#00d2ff"; // กรอบสีฟ้า = Logged In
             } else {
-                // --- กรณีเป็น Guest ---
+                // ไม่ได้ Login = Guest
                 navImg.src = "https://cdn-icons-png.flaticon.com/512/149/149071.png"; 
                 navImg.title = "Guest User";
                 navImg.style.borderColor = "rgba(255,255,255,0.2)";
