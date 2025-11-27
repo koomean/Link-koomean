@@ -10,33 +10,42 @@
         :root { --bg: #121212; --panel: #1e1e1e; --input: #2c2c2c; --accent: #00d2ff; --text: #e0e0e0; }
         body { font-family: 'Kanit', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 20px; }
         .wrapper { width: 100%; max-width: 600px; }
-        .card { background: var(--panel); border-radius: 12px; padding: 20px; margin-bottom: 20px; border: 1px solid #333; }
-        h3 { margin: 0 0 15px 0; color: var(--accent); border-left: 3px solid var(--accent); padding-left: 10px; font-size: 1.1rem; }
+        .card { background: var(--panel); border-radius: 12px; padding: 25px; margin-bottom: 20px; border: 1px solid #333; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        h3 { margin: 0 0 20px 0; color: var(--accent); border-left: 4px solid var(--accent); padding-left: 12px; font-size: 1.2rem; }
         
-        input, select, textarea { width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 6px; border: 1px solid #444; background: var(--input); color: white; box-sizing: border-box; outline: none; transition: 0.3s; }
-        input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+        /* Form Elements */
+        label { display: block; font-size: 0.85rem; color: #aaa; margin-bottom: 5px; margin-top: 10px; }
+        input, select, textarea { width: 100%; padding: 12px; margin-bottom: 5px; border-radius: 8px; border: 1px solid #444; background: var(--input); color: white; box-sizing: border-box; outline: none; transition: 0.3s; font-family: 'Kanit'; }
+        input:focus, select:focus, textarea:focus { border-color: var(--accent); background: #333; }
         
-        .textarea-container { position: relative; width: 100%; margin-bottom: 10px; }
-        .masked { -webkit-text-security: disc; text-security: disc; }
-        .toggle-textarea { position: absolute; top: 10px; right: 10px; cursor: pointer; color: #777; background: rgba(0,0,0,0.5); padding: 5px; border-radius: 4px; font-size: 0.9rem; }
-        .toggle-textarea:hover { color: var(--accent); }
-
-        .password-container { position: relative; width: 100%; margin-bottom: 15px; }
-        .password-container input { width: 100%; margin-bottom: 0; padding-right: 40px; }
-        .toggle-password { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #777; font-size: 1rem; z-index: 10; }
-        .toggle-password:hover { color: var(--accent); }
-
-        .btn { width: 100%; padding: 10px; border: none; border-radius: 6px; font-weight: 500; cursor: pointer; background: var(--accent); color: #000; font-family: 'Kanit'; transition: 0.2s; }
-        .btn:hover { filter: brightness(1.1); }
+        /* Buttons */
+        .btn { width: 100%; padding: 12px; border: none; border-radius: 8px; font-weight: 500; cursor: pointer; background: var(--accent); color: #000; font-family: 'Kanit'; transition: 0.2s; margin-top: 15px; font-size: 1rem; }
+        .btn:hover { filter: brightness(1.1); transform: translateY(-2px); }
         .btn-green { background: #2ecc71; color: white; }
         
-        .link-item { background: #252525; padding: 10px; margin-bottom: 8px; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; border-left: 4px solid #444; }
-        .link-content { flex-grow: 1; margin-left: 10px; }
-        .link-actions { display: flex; gap: 5px; }
-        .btn-icon { background: #333; color: #aaa; width: 32px; height: 32px; border: none; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        .btn-icon:hover { background: #444; color: white; }
-        .btn-del { background: rgba(255, 71, 87, 0.1); color: #ff4757; }
+        /* Toggle Visibility (Password/Config) */
+        .password-container, .textarea-container { position: relative; width: 100%; }
+        .password-container input { padding-right: 45px; }
+        .masked { -webkit-text-security: disc; text-security: disc; } /* ซ่อนตัวอักษร */
         
+        .toggle-icon {
+            position: absolute; right: 15px; cursor: pointer; color: #777; z-index: 10; transition: 0.2s;
+        }
+        .toggle-password { top: 50%; transform: translateY(-50%); font-size: 1rem; } /* สำหรับ input บรรทัดเดียว */
+        .toggle-textarea { top: 15px; background: rgba(0,0,0,0.6); padding: 5px; border-radius: 4px; font-size: 0.9rem; } /* สำหรับ textarea */
+        .toggle-icon:hover { color: var(--accent); }
+
+        /* Link Item List */
+        .link-item { background: #252525; padding: 15px; margin-bottom: 10px; border-radius: 10px; display: flex; align-items: center; justify-content: space-between; border-left: 4px solid #444; transition: 0.2s; }
+        .link-item:hover { background: #2a2a2a; }
+        .link-content { flex-grow: 1; margin-left: 15px; }
+        .link-actions { display: flex; gap: 8px; }
+        
+        .btn-icon { background: #333; color: #aaa; width: 36px; height: 36px; border: none; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+        .btn-icon:hover { background: #444; color: white; }
+        .btn-del { background: rgba(255, 71, 87, 0.15); color: #ff4757; }
+        .btn-del:hover { background: #ff4757; color: white; }
+
         #login-screen, #admin-screen { display: none; }
     </style>
 </head>
@@ -44,76 +53,100 @@
 
     <div id="login-screen" class="wrapper" style="margin-top: 10vh;">
         <div class="card" style="text-align: center;">
-            <h1 style="color:white; margin-bottom:20px;">🔒 Admin</h1>
-            <input type="email" id="email" placeholder="Email" style="margin-bottom: 15px;">
-            <div class="password-container">
-                <input type="password" id="password" placeholder="Password">
-                <i class="fas fa-eye toggle-password" id="togglePassword" onclick="togglePasswordVisibility()"></i>
+            <h1 style="color:white; margin-bottom:20px;">🔒 Admin Login</h1>
+            
+            <div style="text-align: left;">
+                <input type="email" id="email" placeholder="Email" style="margin-bottom: 15px;">
+                <div class="password-container">
+                    <input type="password" id="password" placeholder="Password">
+                    <i class="fas fa-eye toggle-icon toggle-password" id="togglePassword" onclick="togglePasswordVisibility()"></i>
+                </div>
             </div>
-            <button class="btn" onclick="login()">Login</button>
-            <p id="login-error" style="color: #ff4757; font-size: 0.9rem; margin-top: 10px;"></p>
+
+            <button class="btn" onclick="login()">เข้าสู่ระบบ</button>
+            <p id="login-error" style="color: #ff4757; font-size: 0.9rem; margin-top: 15px;"></p>
         </div>
     </div>
 
     <div id="admin-screen" class="wrapper">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
             <h2 style="margin: 0;">⚙️ Dashboard</h2>
-            <button onclick="logout()" style="background:none; border:none; color:#777; cursor:pointer;">Logout</button>
+            <button onclick="logout()" style="background:none; border:none; color:#888; cursor:pointer; font-size:0.9rem;"><i class="fas fa-sign-out-alt"></i> Logout</button>
         </div>
 
         <div class="card">
-            <h3>👤 โปรไฟล์ & คลิปแนะนำ</h3>
-            <label style="font-size: 0.8rem; color: #aaa;">รูปโปรไฟล์หลัก (ตรงกลาง)</label>
-            <input type="text" id="prof-img" placeholder="URL รูปโปรไฟล์หลัก">
+            <h3>👤 ตั้งค่าโปรไฟล์</h3>
             
-            <label style="font-size: 0.8rem; color: #00d2ff;">รูปโปรไฟล์ Admin ทั่วไป (มุมขวาบน)</label>
-            <input type="text" id="nav-admin-img" placeholder="URL รูปเล็กมุมขวาบน" style="border-color: rgba(0, 210, 255, 0.3);">
+            <label>รูปโปรไฟล์หลัก (กลางหน้าจอ)</label>
+            <input type="text" id="prof-img" placeholder="https://...">
+            
+            <label style="color: #00d2ff;">รูปโปรไฟล์ Admin (มุมขวาบน Navbar)</label>
+            <input type="text" id="nav-admin-img" placeholder="https://..." style="border-color: rgba(0, 210, 255, 0.3);">
 
-            <label style="font-size: 0.8rem; color: #aaa;">ชื่อแสดงผล</label>
-            <input type="text" id="prof-name" placeholder="ชื่อ">
+            <div style="display: grid; grid-template-columns: 1fr; gap: 10px;">
+                <div>
+                    <label>ชื่อแสดงผล</label>
+                    <input type="text" id="prof-name" placeholder="ชื่อของคุณ">
+                </div>
+            </div>
             
-            <label style="font-size: 0.8rem; color: #aaa;">คำบรรยาย (Bio)</label>
-            <textarea id="prof-bio" placeholder="Bio..." style="height: 60px;"></textarea>
+            <label>คำบรรยาย (Bio)</label>
+            <textarea id="prof-bio" placeholder="เขียนแนะนำตัว..." style="height: 60px;"></textarea>
             
-            <label style="font-size: 0.9rem; color: #ff4757;"><i class="fab fa-youtube"></i> คลิป Youtube แนะนำตัว</label>
-            <input type="text" id="prof-video" placeholder="https://www.youtube.com/watch?v=..." style="border-color: #ff4757;">
+            <label style="color: #ff4757;"><i class="fab fa-youtube"></i> คลิป Youtube แนะนำตัว</label>
+            <input type="text" id="prof-video" placeholder="https://www.youtube.com/watch?v=..." style="border-color: rgba(255, 71, 87, 0.3);">
+        </div>
 
-            <label style="font-size: 0.8rem; color: #aaa;">รหัสผ่านกลุ่ม (รหัส:ชื่อกลุ่ม)</label>
+        <div class="card">
+            <h3>🔐 ระบบความปลอดภัย & สิทธิ์</h3>
+            
+            <label>รหัสผ่านกลุ่ม (Format: รหัส:ชื่อกลุ่ม)</label>
             <div class="textarea-container">
-                <textarea id="prof-config" class="masked" placeholder="1111:vip&#10;2222:family" style="height: 60px; font-family: monospace; border-color: #ffd700;"></textarea>
-                <i class="fas fa-eye toggle-textarea" id="toggleConfig" onclick="toggleConfigVisibility()"></i>
+                <textarea id="prof-config" class="masked" placeholder="1111:vip&#10;2222:family" style="height: 80px; font-family: monospace; border-color: #ffd700;"></textarea>
+                <i class="fas fa-eye toggle-icon toggle-textarea" id="toggleConfig" onclick="toggleConfigVisibility()"></i>
             </div>
 
-            <label style="font-size: 0.8rem; color: #aaa;">รูปโปรไฟล์รายบุคคล (Email:URL)</label>
-            <textarea id="user-images-config" placeholder="ploy@gmail.com:https://...&#10;admin@test.com:https://..." style="height: 80px; font-family: monospace; border-color: #00d2ff;"></textarea>
+            <label>รูปโปรไฟล์ตามรายชื่อ (Format: Email หรือ ชื่อกลุ่ม : URL)</label>
+            <textarea id="user-images-config" placeholder="ploy@gmail.com:https://...&#10;vip:https://..." style="height: 80px; font-family: monospace; border-color: #00d2ff;"></textarea>
 
-            <button class="btn" onclick="saveProfile()">บันทึกการตั้งค่า</button>
+            <button class="btn" onclick="saveProfile()">บันทึกการตั้งค่าทั้งหมด</button>
         </div>
 
         <div class="card">
             <h3 id="form-title">➕ เพิ่มลิงก์ใหม่</h3>
             <input type="hidden" id="link-id">
             
-            <input type="text" id="linkTitle" placeholder="ชื่อปุ่ม">
-            <input type="text" id="linkUrl" placeholder="URL">
+            <label>ชื่อปุ่ม</label>
+            <input type="text" id="linkTitle" placeholder="เช่น Facebook, งานกลุ่ม">
             
-            <div style="display: flex; gap: 10px;">
-                <select id="linkIcon" style="flex: 1;">
-                    <option value="fas fa-link">🔗 ทั่วไป</option>
-                    <option value="fab fa-google-drive">📂 Google Drive</option>
-                    <option value="fab fa-facebook">📘 Facebook</option>
-                    <option value="fab fa-youtube">🟥 YouTube</option>
-                    <option value="fab fa-instagram">📸 Instagram</option>
-                    <option value="fab fa-tiktok">🎵 TikTok</option>
-                    <option value="fab fa-line">💬 LINE</option>
-                    <option value="fab fa-github">😺 GitHub</option>
-                    <option value="fas fa-envelope">✉️ Email</option>
-                </select>
-                <input type="text" id="linkGroup" placeholder="กลุ่มสิทธิ์ (เช่น vip, family)" style="flex: 1;">
+            <label>ลิงก์ปลายทาง (URL)</label>
+            <input type="text" id="linkUrl" placeholder="https://...">
+            
+            <div style="display: flex; gap: 10px; margin-top: 10px;">
+                <div style="flex: 1;">
+                    <label>ไอคอน</label>
+                    <select id="linkIcon">
+                        <option value="fas fa-link">🔗 ทั่วไป</option>
+                        <option value="fab fa-google-drive">📂 Google Drive</option>
+                        <option value="fab fa-facebook">📘 Facebook</option>
+                        <option value="fab fa-youtube">🟥 YouTube</option>
+                        <option value="fab fa-instagram">📸 Instagram</option>
+                        <option value="fab fa-tiktok">🎵 TikTok</option>
+                        <option value="fab fa-line">💬 LINE</option>
+                        <option value="fab fa-github">😺 GitHub</option>
+                        <option value="fas fa-envelope">✉️ Email</option>
+                        <option value="fas fa-map-marker-alt">📍 Map</option>
+                        <option value="fas fa-phone">📞 Phone</option>
+                    </select>
+                </div>
+                <div style="flex: 1;">
+                    <label>กลุ่มสิทธิ์ (ว่าง = สาธารณะ)</label>
+                    <input type="text" id="linkGroup" placeholder="เช่น vip, family" style="margin-top: 0;">
+                </div>
             </div>
 
             <button class="btn" id="save-btn" onclick="saveLink()">เพิ่มลิงก์</button>
-            <button class="btn" id="cancel-btn" onclick="resetForm()" style="background: #444; color: white; margin-top: 5px; display: none;">ยกเลิกแก้ไข</button>
+            <button class="btn" id="cancel-btn" onclick="resetForm()" style="background: #444; color: white; margin-top: 10px; display: none;">ยกเลิกแก้ไข</button>
         </div>
 
         <div id="links-list"></div>
@@ -124,7 +157,9 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
 
     <script>
-        // ⚠️ ใส่ Config ของคุณ
+        // ------------------------------------------------------------------
+        // ⚠️ [ส่วนสำคัญ] ใส่ Firebase Config ของคุณที่นี่
+        // ------------------------------------------------------------------
         const firebaseConfig = {
             apiKey: "AIzaSyB-Brx6cQ7dFhQqbEhDG4xIT4jcVG1yogs",
   authDomain: "mylinks-web.firebaseapp.com",
@@ -133,15 +168,19 @@
   messagingSenderId: "702413304222",
   appId: "1:702413304222:web:d255e6c2f428bb1e1d668f",
         };
+        // ------------------------------------------------------------------
 
+        // Initialize Firebase
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
 
+        // UI References
         const loginScreen = document.getElementById('login-screen');
         const adminScreen = document.getElementById('admin-screen');
         let allLinks = [];
 
+        // --- Auth State Listener ---
         auth.onAuthStateChanged((user) => {
             if (user) {
                 loginScreen.style.display = 'none';
@@ -154,44 +193,44 @@
             }
         });
 
+        // --- UI Toggles ---
         function togglePasswordVisibility() {
-            const passwordInput = document.getElementById('password');
-            const toggleIcon = document.getElementById('togglePassword');
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                toggleIcon.classList.remove('fa-eye');
-                toggleIcon.classList.add('fa-eye-slash');
+            const input = document.getElementById('password');
+            const icon = document.getElementById('togglePassword');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.replace('fa-eye', 'fa-eye-slash');
             } else {
-                passwordInput.type = 'password';
-                toggleIcon.classList.remove('fa-eye-slash');
-                toggleIcon.classList.add('fa-eye');
+                input.type = 'password';
+                icon.classList.replace('fa-eye-slash', 'fa-eye');
             }
         }
 
         function toggleConfigVisibility() {
-            const textArea = document.getElementById('prof-config');
-            const toggleIcon = document.getElementById('toggleConfig');
-            if (textArea.classList.contains('masked')) {
-                textArea.classList.remove('masked');
-                toggleIcon.classList.remove('fa-eye');
-                toggleIcon.classList.add('fa-eye-slash');
-                toggleIcon.style.color = '#00d2ff';
+            const area = document.getElementById('prof-config');
+            const icon = document.getElementById('toggleConfig');
+            if (area.classList.contains('masked')) {
+                area.classList.remove('masked');
+                icon.classList.replace('fa-eye', 'fa-eye-slash');
+                icon.style.color = '#00d2ff';
             } else {
-                textArea.classList.add('masked');
-                toggleIcon.classList.remove('fa-eye-slash');
-                toggleIcon.classList.add('fa-eye');
-                toggleIcon.style.color = '#777';
+                area.classList.add('masked');
+                icon.classList.replace('fa-eye-slash', 'fa-eye');
+                icon.style.color = '#777';
             }
         }
 
+        // --- Authentication ---
         function login() {
             const email = document.getElementById('email').value;
             const pass = document.getElementById('password').value;
-            auth.signInWithEmailAndPassword(email, pass).catch(err => document.getElementById('login-error').innerText = err.message);
+            auth.signInWithEmailAndPassword(email, pass).catch(err => {
+                document.getElementById('login-error').innerText = "Login Failed: " + err.message;
+            });
         }
         function logout() { auth.signOut(); }
 
-        // --- Load & Save Profile (Updated) ---
+        // --- Profile Management ---
         function loadProfile() {
             db.doc("settings/profile").get().then((doc) => {
                 if(doc.exists) {
@@ -202,8 +241,6 @@
                     document.getElementById('prof-bio').value = d.bio || '';
                     document.getElementById('prof-video').value = d.featuredVideo || ''; 
                     document.getElementById('prof-config').value = d.accessConfig || '';
-                    
-                    // โหลดค่า config รูปภาพรายคน
                     document.getElementById('user-images-config').value = d.userImagesConfig || '';
                 }
             });
@@ -217,34 +254,37 @@
                 bio: document.getElementById('prof-bio').value,
                 featuredVideo: document.getElementById('prof-video').value, 
                 accessConfig: document.getElementById('prof-config').value,
-                
-                // บันทึกค่า config รูปภาพรายคน
                 userImagesConfig: document.getElementById('user-images-config').value
-            }, { merge: true }).then(() => alert('✅ Saved!'));
+            }, { merge: true }).then(() => alert('✅ บันทึกข้อมูลเรียบร้อย!'));
         }
 
+        // --- Link Management ---
         function loadLinks() {
             db.collection("links").orderBy("order", "asc").get().then((snapshot) => {
                 allLinks = [];
                 const listDiv = document.getElementById('links-list');
                 listDiv.innerHTML = '';
+                
                 snapshot.forEach(doc => allLinks.push({ id: doc.id, ...doc.data() }));
 
                 allLinks.forEach((link, index) => {
-                    const groupLabel = link.group && link.group !== 'public' ? `<span style="color:#ffd700; font-size:0.8rem;">[${link.group}]</span>` : '';
+                    const groupLabel = link.group && link.group !== 'public' 
+                        ? `<span style="background:#00d2ff; color:black; padding:2px 6px; border-radius:4px; font-size:0.7rem; margin-left:5px;">${link.group}</span>` 
+                        : '';
+                    
                     listDiv.innerHTML += `
                         <div class="link-item">
                             <div class="link-actions" style="flex-direction: column; gap: 2px;">
-                                <button class="btn-icon" onclick="moveLink(${index}, -1)">▲</button>
-                                <button class="btn-icon" onclick="moveLink(${index}, 1)">▼</button>
+                                <button class="btn-icon" onclick="moveLink(${index}, -1)" title="ย้ายขึ้น">▲</button>
+                                <button class="btn-icon" onclick="moveLink(${index}, 1)" title="ย้ายลง">▼</button>
                             </div>
                             <div class="link-content">
                                 <strong><i class="${link.icon}"></i> ${link.title} ${groupLabel}</strong><br>
-                                <small style="color:#777;">${link.url}</small>
+                                <small style="color:#777; overflow-wrap: break-word;">${link.url}</small>
                             </div>
                             <div class="link-actions">
-                                <button class="btn-icon" onclick="editLink('${link.id}')"><i class="fas fa-pen"></i></button>
-                                <button class="btn-icon btn-del" onclick="deleteLink('${link.id}')"><i class="fas fa-trash"></i></button>
+                                <button class="btn-icon" onclick="editLink('${link.id}')" title="แก้ไข"><i class="fas fa-pen"></i></button>
+                                <button class="btn-icon btn-del" onclick="deleteLink('${link.id}')" title="ลบ"><i class="fas fa-trash"></i></button>
                             </div>
                         </div>
                     `;
@@ -260,7 +300,8 @@
             let group = document.getElementById('linkGroup').value.trim();
             if (!group) group = 'public';
 
-            if(!title || !url) return alert('กรอกข้อมูลให้ครบ');
+            if(!title || !url) return alert('กรุณากรอก ชื่อปุ่ม และ ลิงก์ ให้ครบถ้วน');
+            
             const data = { title, url, icon, group };
 
             if (id) {
@@ -281,10 +322,12 @@
                 document.getElementById('linkGroup').value = link.group === 'public' ? '' : link.group;
                 
                 document.getElementById('form-title').innerText = '✏️ แก้ไขลิงก์';
-                document.getElementById('save-btn').innerText = 'บันทึกแก้ไข';
+                document.getElementById('save-btn').innerText = 'บันทึกการแก้ไข';
                 document.getElementById('save-btn').classList.add('btn-green');
                 document.getElementById('cancel-btn').style.display = 'block';
-                window.scrollTo(0, 0);
+                
+                // Scroll to form
+                document.querySelector('.card:nth-of-type(3)').scrollIntoView({ behavior: 'smooth' });
             }
         }
 
@@ -303,9 +346,12 @@
             if (index + direction < 0 || index + direction >= allLinks.length) return;
             const currentLink = allLinks[index];
             const swapLink = allLinks[index + direction];
+            
+            // Swap orders
             const tempOrder = currentLink.order;
             currentLink.order = swapLink.order;
             swapLink.order = tempOrder;
+
             Promise.all([
                 db.collection('links').doc(currentLink.id).update({ order: currentLink.order }),
                 db.collection('links').doc(swapLink.id).update({ order: swapLink.order })
@@ -313,7 +359,9 @@
         }
 
         function deleteLink(id) {
-            if(confirm('ลบนะ?')) db.collection('links').doc(id).delete().then(() => loadLinks());
+            if(confirm('ยืนยันที่จะลบลิงก์นี้?')) {
+                db.collection('links').doc(id).delete().then(() => loadLinks());
+            }
         }
     </script>
 </body>
