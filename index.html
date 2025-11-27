@@ -12,6 +12,7 @@
             --card-bg: rgba(255, 255, 255, 0.08);
             --text-color: #ffffff;
             --accent: #00d2ff;
+            --navbar-height: 60px;
         }
         body {
             font-family: 'Kanit', sans-serif;
@@ -22,10 +23,48 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 40px 20px;
+            padding-top: calc(var(--navbar-height) + 30px); /* เว้นที่ให้ Navbar */
+            padding-bottom: 40px;
         }
 
-        /* Profile */
+        /* --- Navbar (ส่วนที่เพิ่มใหม่) --- */
+        .navbar {
+            position: fixed;
+            top: 0; left: 0; width: 100%;
+            height: var(--navbar-height);
+            background: rgba(15, 12, 41, 0.8); /* พื้นหลังโปร่งแสง */
+            backdrop-filter: blur(15px); /* เบลอฉากหลัง */
+            -webkit-backdrop-filter: blur(15px);
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 20px;
+            box-sizing: border-box;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
+
+        .nav-logo {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #fff;
+            text-decoration: none;
+            display: flex; align-items: center; gap: 10px;
+            letter-spacing: 0.5px;
+        }
+        .nav-logo i { color: var(--accent); font-size: 1.1rem; }
+        .nav-logo span { background: linear-gradient(90deg, #fff, var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+        .nav-profile-img {
+            width: 38px; height: 38px;
+            border-radius: 50%;
+            border: 2px solid var(--accent);
+            object-fit: cover;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        .nav-profile-img:hover { transform: scale(1.1); }
+
+        /* --- Profile Section --- */
         .profile-section { text-align: center; margin-bottom: 25px; animation: fadeIn 0.8s ease; }
         .profile-img {
             width: 120px; height: 120px; border-radius: 50%;
@@ -37,7 +76,7 @@
 
         /* Video Container */
         .video-container {
-            width: 100%; max-width: 500px; margin-bottom: 25px;
+            width: 90%; max-width: 500px; margin-bottom: 25px;
             display: none; animation: fadeIn 1s ease;
         }
         .video-wrapper {
@@ -47,7 +86,7 @@
         .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
 
         /* Links Container */
-        .container { width: 100%; max-width: 500px; padding-bottom: 60px; display: flex; flex-direction: column; gap: 14px; }
+        .container { width: 90%; max-width: 500px; padding-bottom: 60px; display: flex; flex-direction: column; gap: 14px; }
         
         .link-card {
             background: var(--card-bg);
@@ -101,11 +140,29 @@
             cursor: pointer; transition: 0.3s; z-index: 100;
         }
         .unlock-btn.active { color: #00d2ff; border-color: #00d2ff; background: rgba(0, 210, 255, 0.1); }
-        .admin-link { margin-top: auto; color: rgba(255,255,255,0.2); text-decoration: none; font-size: 0.8rem; }
+        
+        /* Footer Admin Link */
+        .admin-link { 
+            margin-top: auto; 
+            color: rgba(255,255,255,0.2); 
+            text-decoration: none; 
+            font-size: 0.8rem; 
+            padding-bottom: 20px;
+        }
+        .admin-link:hover { color: var(--accent); }
+        
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
+
+    <nav class="navbar">
+        <a href="#" class="nav-logo">
+            <i class="fas fa-link"></i>
+            <span>Koo Mean Links</span>
+        </a>
+        <img id="nav-profile-img" src="https://ui-avatars.com/api/?name=User" class="nav-profile-img" alt="User">
+    </nav>
 
     <div class="profile-section" id="profile-section"></div>
 
@@ -131,7 +188,7 @@
     <script>
         // ⚠️ ใส่ Config ของคุณที่นี่
         const firebaseConfig = {
-            apiKey: "AIzaSyB-Brx6cQ7dFhQqbEhDG4xIT4jcVG1yogs",
+           apiKey: "AIzaSyB-Brx6cQ7dFhQqbEhDG4xIT4jcVG1yogs",
   authDomain: "mylinks-web.firebaseapp.com",
   projectId: "mylinks-web",
   storageBucket: "mylinks-web.firebasestorage.app",
@@ -172,21 +229,15 @@
                 let allLinks = [];
                 snapshot.forEach(doc => allLinks.push(doc.data()));
 
-                // --- LOGIC ใหม่: รองรับหลายกลุ่ม (Multi-Group) ---
                 const visibleLinks = allLinks.filter(link => {
                     const groupString = link.group || 'public';
-                    // แปลงข้อความ "vip, family" ให้เป็น Array ["vip", "family"]
                     const allowedGroups = groupString.split(',').map(g => g.trim());
-                    
-                    // เช็คว่า 'public' หรือ กลุ่มปัจจุบันของผู้ใช้ อยู่ใน Array นั้นไหม
                     return allowedGroups.includes('public') || allowedGroups.includes(currentAccessGroup);
                 });
 
-                // แยกกองลิงก์ (Special vs Public)
                 const specialLinks = visibleLinks.filter(link => {
                     const groupString = link.group || 'public';
                     const allowedGroups = groupString.split(',').map(g => g.trim());
-                    // เป็น Special ถ้าไม่ใช่ public และกลุ่มปัจจุบันของผู้ใช้อยู่ใน list
                     return !allowedGroups.includes('public') && allowedGroups.includes(currentAccessGroup);
                 });
                 
@@ -207,11 +258,18 @@
         }
 
         function renderProfile(data) {
+            const defaultImg = 'https://ui-avatars.com/api/?name=User';
+            const imgUrl = data.imageUrl || defaultImg;
+
+            // 1. อัปเดตโปรไฟล์หลักตรงกลาง
             document.getElementById('profile-section').innerHTML = `
-                <img src="${data.imageUrl || 'https://ui-avatars.com/api/?name=User'}" class="profile-img">
+                <img src="${imgUrl}" class="profile-img">
                 <h1>${data.name || 'My Links'}</h1>
                 <p class="bio">${data.bio || ''}</p>
             `;
+
+            // 2. อัปเดตโปรไฟล์ใน Navbar ด้านขวาบน
+            document.getElementById('nav-profile-img').src = imgUrl;
         }
 
         function renderVideo(url) {
@@ -235,7 +293,6 @@
         function renderLink(container, link, isSpecial) {
             const iconClass = link.icon || 'fas fa-link';
             const specialClass = isSpecial ? 'special-access' : '';
-            // โชว์ Badge เป็นชื่อกลุ่มที่เรา Login อยู่
             const badge = isSpecial ? `<span class="badge badge-vip">${currentAccessGroup}</span>` : '';
 
             const html = `
