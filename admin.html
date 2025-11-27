@@ -13,7 +13,7 @@
         .card { background: var(--panel); border-radius: 12px; padding: 20px; margin-bottom: 20px; border: 1px solid #333; }
         h3 { margin: 0 0 15px 0; color: var(--accent); border-left: 3px solid var(--accent); padding-left: 10px; font-size: 1.1rem; }
         
-        input, select, textarea { width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 6px; border: 1px solid #444; background: var(--input); color: white; box-sizing: border-box; outline: none; transition: 0.3s; }
+        input, select, textarea { width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 6px; border: 1px solid #444; background: var(--input); color: white; box-sizing: border-box; outline: none; transition: 0.3s; font-family: 'Kanit'; }
         input:focus, select:focus, textarea:focus { border-color: var(--accent); }
         
         .textarea-container { position: relative; width: 100%; margin-bottom: 10px; }
@@ -75,6 +75,9 @@
             <label style="font-size: 0.8rem; color: #aaa;">คำบรรยาย (Bio)</label>
             <textarea id="prof-bio" placeholder="Bio..." style="height: 60px;"></textarea>
             
+            <label style="font-size: 0.9rem; color: #e056fd;"><i class="fas fa-info-circle"></i> เนื้อหาหน้า "เกี่ยวกับ"</label>
+            <textarea id="about-text" placeholder="พิมพ์ข้อความแนะนำตัว หรือรายละเอียดเว็บไซต์ที่นี่..." style="height: 100px; border-color: #e056fd;"></textarea>
+
             <label style="font-size: 0.9rem; color: #ff4757;"><i class="fab fa-youtube"></i> คลิป Youtube</label>
             <input type="text" id="prof-video" placeholder="https://www.youtube.com/watch?v=..." style="border-color: #ff4757;">
 
@@ -128,7 +131,7 @@
     <script>
         // ⚠️ ใส่ Config ของคุณ
         const firebaseConfig = {
-           apiKey: "AIzaSyB-Brx6cQ7dFhQqbEhDG4xIT4jcVG1yogs",
+            apiKey: "AIzaSyB-Brx6cQ7dFhQqbEhDG4xIT4jcVG1yogs",
   authDomain: "mylinks-web.firebaseapp.com",
   projectId: "mylinks-web",
   storageBucket: "mylinks-web.firebasestorage.app",
@@ -201,11 +204,10 @@
                     document.getElementById('nav-admin-img').value = d.navbarAdminImage || '';
                     document.getElementById('prof-name').value = d.name || '';
                     document.getElementById('prof-bio').value = d.bio || '';
+                    document.getElementById('about-text').value = d.aboutText || ''; // โหลด About Text
                     document.getElementById('prof-video').value = d.featuredVideo || ''; 
                     document.getElementById('prof-config').value = d.accessConfig || '';
                     document.getElementById('user-images-config').value = d.userImagesConfig || '';
-                    
-                    // โหลดค่าเมนูแอป
                     document.getElementById('apps-config').value = d.appsConfig || '';
                 }
             });
@@ -217,11 +219,10 @@
                 navbarAdminImage: document.getElementById('nav-admin-img').value,
                 name: document.getElementById('prof-name').value,
                 bio: document.getElementById('prof-bio').value,
+                aboutText: document.getElementById('about-text').value, // บันทึก About Text
                 featuredVideo: document.getElementById('prof-video').value, 
                 accessConfig: document.getElementById('prof-config').value,
                 userImagesConfig: document.getElementById('user-images-config').value,
-                
-                // บันทึกค่าเมนูแอป
                 appsConfig: document.getElementById('apps-config').value
             }, { merge: true }).then(() => alert('✅ บันทึกข้อมูลเรียบร้อย!'));
         }
@@ -231,7 +232,6 @@
                 allLinks = [];
                 const listDiv = document.getElementById('links-list');
                 listDiv.innerHTML = '';
-                
                 snapshot.forEach(doc => allLinks.push({ id: doc.id, ...doc.data() }));
 
                 allLinks.forEach((link, index) => {
@@ -268,7 +268,6 @@
             if (!group) group = 'public';
 
             if(!title || !url) return alert('กรอกข้อมูลให้ครบ');
-            
             const data = { title, url, icon, group };
 
             if (id) {
