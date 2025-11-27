@@ -63,8 +63,16 @@
 
         <div class="card">
             <h3>👤 โปรไฟล์ & คลิปแนะนำ</h3>
-            <input type="text" id="prof-img" placeholder="URL รูปโปรไฟล์">
+            <label style="font-size: 0.8rem; color: #aaa;">รูปโปรไฟล์หลัก (ตรงกลาง)</label>
+            <input type="text" id="prof-img" placeholder="URL รูปโปรไฟล์หลัก">
+            
+            <label style="font-size: 0.8rem; color: #00d2ff;">รูปโปรไฟล์ Admin (มุมขวาบน)</label>
+            <input type="text" id="nav-admin-img" placeholder="URL รูปเล็กมุมขวาบน (ถ้าว่างจะใช้รูปสุ่ม)" style="border-color: rgba(0, 210, 255, 0.3);">
+
+            <label style="font-size: 0.8rem; color: #aaa;">ชื่อแสดงผล</label>
             <input type="text" id="prof-name" placeholder="ชื่อ">
+            
+            <label style="font-size: 0.8rem; color: #aaa;">คำบรรยาย (Bio)</label>
             <textarea id="prof-bio" placeholder="Bio..." style="height: 60px;"></textarea>
             
             <label style="font-size: 0.9rem; color: #ff4757;"><i class="fab fa-youtube"></i> คลิป Youtube แนะนำตัว</label>
@@ -112,7 +120,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
 
     <script>
-        // ⚠️ ใส่ Config เดิม
+        // ⚠️ ใส่ Config ของคุณตรงนี้
         const firebaseConfig = {
             apiKey: "AIzaSyB-Brx6cQ7dFhQqbEhDG4xIT4jcVG1yogs",
   authDomain: "mylinks-web.firebaseapp.com",
@@ -179,11 +187,13 @@
         }
         function logout() { auth.signOut(); }
 
+        // --- Load & Save Profile (Updated) ---
         function loadProfile() {
             db.doc("settings/profile").get().then((doc) => {
                 if(doc.exists) {
                     const d = doc.data();
                     document.getElementById('prof-img').value = d.imageUrl || '';
+                    document.getElementById('nav-admin-img').value = d.navbarAdminImage || ''; // โหลดรูป Navbar
                     document.getElementById('prof-name').value = d.name || '';
                     document.getElementById('prof-bio').value = d.bio || '';
                     document.getElementById('prof-video').value = d.featuredVideo || ''; 
@@ -195,6 +205,7 @@
         function saveProfile() {
             db.doc("settings/profile").set({
                 imageUrl: document.getElementById('prof-img').value,
+                navbarAdminImage: document.getElementById('nav-admin-img').value, // บันทึกรูป Navbar
                 name: document.getElementById('prof-name').value,
                 bio: document.getElementById('prof-bio').value,
                 featuredVideo: document.getElementById('prof-video').value, 
