@@ -141,12 +141,12 @@
     <script>
         // ⚠️ ใส่ Config ของคุณที่นี่
         const firebaseConfig = {
-            apiKey: "ใส่_API_KEY_ของคุณ",
-            authDomain: "mylinks-web.firebaseapp.com",
-            projectId: "mylinks-web",
-            storageBucket: "mylinks-web.firebasestorage.app",
-            messagingSenderId: "702413304222",
-            appId: "1:702413304222:web:d255e6c2f428bb1e1d668f",
+            apiKey: "AIzaSyB-Brx6cQ7dFhQqbEhDG4xIT4jcVG1yogs",
+  authDomain: "mylinks-web.firebaseapp.com",
+  projectId: "mylinks-web",
+  storageBucket: "mylinks-web.firebasestorage.app",
+  messagingSenderId: "702413304222",
+  appId: "1:702413304222:web:d255e6c2f428bb1e1d668f",
         };
 
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
@@ -155,10 +155,9 @@
 
         let currentAccessGroup = 'public';
         let accessRules = {};
-        let adminProfileImage = ''; // รูป default ของ admin
-        let userImagesMap = {}; // เก็บข้อมูลจับคู่ Email:รูปภาพ
+        let adminProfileImage = ''; 
+        let userImagesMap = {};
 
-        // โหลดข้อมูลก่อน
         function loadData() {
             db.doc("settings/profile").get().then((doc) => {
                 if (doc.exists) {
@@ -166,23 +165,20 @@
                     renderProfile(data);
                     renderVideo(data.featuredVideo);
                     
-                    adminProfileImage = data.navbarAdminImage; // จำรูป default
+                    adminProfileImage = data.navbarAdminImage;
                     
-                    // แปลงข้อความ config รูปภาพรายคน ให้เป็น Object map
-                    // รูปแบบใน DB: "ploy@gmail.com:http://img.jpg\nadmin@test.com:http://..."
+                    // โหลด config รูปภาพ (ทั้ง Email และ Group)
                     if (data.userImagesConfig) {
                         data.userImagesConfig.split('\n').forEach(line => {
-                            // ใช้ indexOf เพื่อเเยกอีเมลกับ url (เผื่อ url มี colon)
                             const splitIndex = line.indexOf(':');
                             if (splitIndex > 0) {
-                                const email = line.substring(0, splitIndex).trim();
+                                const key = line.substring(0, splitIndex).trim(); // key อาจเป็น email หรือ group name
                                 const url = line.substring(splitIndex + 1).trim();
-                                if(email && url) userImagesMap[email] = url;
+                                if(key && url) userImagesMap[key] = url;
                             }
                         });
                     }
 
-                    // โหลด config รหัสผ่านกลุ่ม
                     if (data.accessConfig) {
                         data.accessConfig.split('\n').forEach(line => {
                             const [code, group] = line.split(':');
@@ -190,20 +186,14 @@
                         });
                     }
 
-                    // เช็ค Auth อีกทีหลังจากโหลด config เสร็จ เพื่ออัปเดตรูป
                     checkAuthStatus();
                 }
             });
 
+            // ... (โค้ดโหลดลิงก์ส่วนอื่นเหมือนเดิม) ...
             db.collection("links").orderBy("order", "asc").get().then((snapshot) => {
                 const container = document.getElementById('links-container');
                 container.innerHTML = ''; 
-
-                if(snapshot.empty) {
-                    container.innerHTML = '<p style="text-align:center; opacity:0.5;">Empty</p>';
-                    return;
-                }
-
                 let allLinks = [];
                 snapshot.forEach(doc => allLinks.push(doc.data()));
 
@@ -244,31 +234,30 @@
             updateNavbarUI(user);
         });
 
-        // --- ฟังก์ชันอัปเดตรูป Navbar (Logic ที่สำคัญที่สุด) ---
         function updateNavbarUI(user) {
             const navImg = document.getElementById('nav-profile-img');
             
             if (user) {
-                // 1. เช็คว่ามีรูปเฉพาะเจาะจงสำหรับอีเมลนี้ไหม (จาก Config ที่ตั้งใน Admin)
+                // 1. Admin Login (เช็ค Email)
                 if (userImagesMap[user.email]) {
                     navImg.src = userImagesMap[user.email];
-                } 
-                // 2. ถ้าไม่มี ให้ใช้รูป Admin ทั่วไป (จาก Config)
-                else if (adminProfileImage) {
+                } else if (adminProfileImage) {
                     navImg.src = adminProfileImage;
-                } 
-                // 3. ถ้าไม่มีอีก ให้ใช้รูปจาก Google Auth หรือรูปสุ่ม
-                else {
+                } else {
                     navImg.src = user.photoURL || `https://ui-avatars.com/api/?name=${user.email}&background=random`;
                 }
-                
-                navImg.title = "User: " + user.email;
-                navImg.style.borderColor = "#00d2ff"; // กรอบสีฟ้า = Logged In
+                navImg.style.borderColor = "#00d2ff";
             } else {
-                // ไม่ได้ Login = Guest
-                navImg.src = "https://cdn-icons-png.flaticon.com/512/149/149071.png"; 
-                navImg.title = "Guest User";
-                navImg.style.borderColor = "rgba(255,255,255,0.2)";
+                // 2. Guest (เช็ค Group Code)
+                if (currentAccessGroup !== 'public' && userImagesMap[currentAccessGroup]) {
+                    // ถ้าใส่รหัสลับ แล้วกลุ่มนั้นมีรูป -> ใช้รูปกลุ่ม
+                    navImg.src = userImagesMap[currentAccessGroup];
+                    navImg.style.borderColor = "#ffbd00"; // สีทอง
+                } else {
+                    // Guest ทั่วไป
+                    navImg.src = "https://cdn-icons-png.flaticon.com/512/149/149071.png"; 
+                    navImg.style.borderColor = "rgba(255,255,255,0.2)";
+                }
             }
         }
 
@@ -315,17 +304,21 @@
 
         function handleUnlock() {
             if (currentAccessGroup !== 'public') {
+                // Logout
                 currentAccessGroup = 'public';
                 alert("🔒 ล็อคระบบแล้ว");
                 document.getElementById('unlockBtn').classList.remove('active');
                 document.getElementById('unlockBtn').innerHTML = '<i class="fas fa-lock"></i>';
+                updateNavbarUI(null); // รีเซ็ตรูป Navbar กลับเป็น Guest
                 loadData();
             } else {
+                // Login
                 const input = prompt("🔑 กรุณาใส่รหัสผ่านเข้าถึง:");
                 if (input && accessRules[input]) {
                     currentAccessGroup = accessRules[input];
                     document.getElementById('unlockBtn').classList.add('active');
                     document.getElementById('unlockBtn').innerHTML = '<i class="fas fa-unlock"></i>';
+                    updateNavbarUI(null); // อัปเดตรูป Navbar ตามกลุ่มใหม่
                     loadData();
                 } else if (input) {
                     alert("❌ รหัสไม่ถูกต้อง");
