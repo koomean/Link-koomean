@@ -27,14 +27,19 @@
             padding-bottom: 40px;
         }
 
+        /* --- Navbar --- */
         .navbar {
             position: fixed; top: 0; left: 0; width: 100%; height: var(--navbar-height);
-            background: rgba(15, 12, 41, 0.85); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            background: rgba(15, 12, 41, 0.9); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
             display: flex; justify-content: space-between; align-items: center;
             padding: 0 20px; box-sizing: border-box; z-index: 1000;
             border-bottom: 1px solid rgba(255,255,255,0.1);
             box-shadow: 0 4px 20px rgba(0,0,0,0.2);
         }
+        
+        /* Logo + Apps Menu */
+        .nav-left { display: flex; align-items: center; gap: 20px; }
+        
         .nav-logo {
             font-size: 1.2rem; font-weight: 600; color: #fff; text-decoration: none;
             display: flex; align-items: center; gap: 10px; letter-spacing: 0.5px;
@@ -42,7 +47,36 @@
         .nav-logo i { color: var(--accent); font-size: 1.1rem; }
         .nav-logo span { background: linear-gradient(90deg, #fff, var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
-        .nav-user-container { display: flex; align-items: center; gap: 10px; }
+        /* Dropdown Apps */
+        .dropdown { position: relative; display: inline-block; }
+        .dropbtn {
+            color: rgba(255,255,255,0.7); cursor: pointer; font-size: 0.95rem; font-weight: 500;
+            padding: 8px 12px; border-radius: 8px; transition: 0.3s; display: flex; align-items: center; gap: 5px;
+        }
+        .dropbtn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+        .dropdown-content {
+            display: none; position: absolute; top: 100%; left: 0;
+            background-color: rgba(20, 20, 30, 0.95); min-width: 180px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.5); border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.1); overflow: hidden; margin-top: 5px;
+            backdrop-filter: blur(10px);
+        }
+        .dropdown-content a {
+            color: #e0e0e0; padding: 12px 16px; text-decoration: none; display: block; font-size: 0.9rem; transition: 0.2s;
+        }
+        .dropdown-content a:hover { background-color: var(--accent); color: #000; }
+        .dropdown:hover .dropdown-content { display: block; }
+
+        /* Right Side: Clock & Profile */
+        .nav-right { display: flex; align-items: center; gap: 15px; }
+        
+        .nav-clock {
+            font-family: 'Courier New', monospace; font-weight: bold; font-size: 1rem;
+            color: var(--accent); text-shadow: 0 0 10px rgba(0, 210, 255, 0.5);
+            background: rgba(0,0,0,0.3); padding: 5px 10px; border-radius: 6px;
+            border: 1px solid rgba(0, 210, 255, 0.3);
+        }
+
         .nav-profile-img {
             width: 38px; height: 38px; border-radius: 50%;
             border: 2px solid rgba(255,255,255,0.2);
@@ -51,6 +85,7 @@
         }
         .nav-profile-img:hover { transform: scale(1.1); border-color: var(--accent); }
 
+        /* Main Content */
         .profile-section { text-align: center; margin-bottom: 25px; animation: fadeIn 0.8s ease; }
         .profile-img {
             width: 120px; height: 120px; border-radius: 50%;
@@ -101,18 +136,38 @@
         .admin-link { margin-top: auto; color: rgba(255,255,255,0.2); text-decoration: none; font-size: 0.8rem; padding-bottom: 20px; }
         .admin-link:hover { color: var(--accent); }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Responsive Navbar */
+        @media (max-width: 400px) {
+            .nav-logo span { display: none; } /* ซ่อนชื่อเว็บถ้าจอเล็กมาก */
+            .dropbtn { font-size: 0.85rem; }
+        }
     </style>
 </head>
 <body>
 
     <nav class="navbar">
-        <a href="#" class="nav-logo">
-            <i class="fas fa-link"></i>
-            <span>Koo Mean Links</span>
-        </a>
+        <div class="nav-left">
+            <a href="#" class="nav-logo">
+                <i class="fas fa-link"></i>
+                <span>Koo Mean</span>
+            </a>
+            
+            <div class="dropdown">
+                <div class="dropbtn">
+                    <i class="fas fa-th-large"></i> แอปพลิเคชัน <i class="fas fa-chevron-down" style="font-size:0.7rem;"></i>
+                </div>
+                <div class="dropdown-content" id="apps-dropdown-list">
+                    </div>
+            </div>
+        </div>
         
-        <div class="nav-user-container" onclick="window.location.href='admin.html'">
-            <img id="nav-profile-img" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" class="nav-profile-img" alt="User">
+        <div class="nav-right">
+            <div class="nav-clock" id="nav-clock">00:00:00</div>
+            
+            <div class="nav-user-container" onclick="window.location.href='admin.html'">
+                <img id="nav-profile-img" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" class="nav-profile-img" alt="User">
+            </div>
         </div>
     </nav>
 
@@ -139,7 +194,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
 
     <script>
-        // ⚠️ ใส่ Config ของคุณที่นี่
+        // ⚠️ ใส่ Config ของคุณ
         const firebaseConfig = {
             apiKey: "AIzaSyB-Brx6cQ7dFhQqbEhDG4xIT4jcVG1yogs",
   authDomain: "mylinks-web.firebaseapp.com",
@@ -155,8 +210,17 @@
 
         let currentAccessGroup = 'public';
         let accessRules = {};
-        let adminProfileImage = ''; 
+        let adminProfileImage = '';
         let userImagesMap = {};
+
+        // --- Clock Script ---
+        function updateClock() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('th-TH'); // แสดงเวลาไทย
+            document.getElementById('nav-clock').innerText = timeString;
+        }
+        setInterval(updateClock, 1000);
+        updateClock(); // Run immediately
 
         function loadData() {
             db.doc("settings/profile").get().then((doc) => {
@@ -164,15 +228,20 @@
                     const data = doc.data();
                     renderProfile(data);
                     renderVideo(data.featuredVideo);
-                    
                     adminProfileImage = data.navbarAdminImage;
                     
-                    // โหลด config รูปภาพ (ทั้ง Email และ Group)
+                    // โหลดและสร้างเมนูแอป
+                    if (data.appsConfig) {
+                        renderAppsMenu(data.appsConfig);
+                    } else {
+                        document.getElementById('apps-dropdown-list').innerHTML = '<a href="#" style="color:#aaa;">ไม่มีแอป</a>';
+                    }
+
                     if (data.userImagesConfig) {
                         data.userImagesConfig.split('\n').forEach(line => {
                             const splitIndex = line.indexOf(':');
                             if (splitIndex > 0) {
-                                const key = line.substring(0, splitIndex).trim(); // key อาจเป็น email หรือ group name
+                                const key = line.substring(0, splitIndex).trim();
                                 const url = line.substring(splitIndex + 1).trim();
                                 if(key && url) userImagesMap[key] = url;
                             }
@@ -190,7 +259,6 @@
                 }
             });
 
-            // ... (โค้ดโหลดลิงก์ส่วนอื่นเหมือนเดิม) ...
             db.collection("links").orderBy("order", "asc").get().then((snapshot) => {
                 const container = document.getElementById('links-container');
                 container.innerHTML = ''; 
@@ -225,6 +293,20 @@
             });
         }
 
+        function renderAppsMenu(configStr) {
+            const menuContainer = document.getElementById('apps-dropdown-list');
+            menuContainer.innerHTML = ''; // Clear
+            
+            configStr.split('\n').forEach(line => {
+                const parts = line.split('|');
+                if(parts.length >= 2) {
+                    const name = parts[0].trim();
+                    const url = parts[1].trim();
+                    menuContainer.innerHTML += `<a href="${url}" target="_blank">${name}</a>`;
+                }
+            });
+        }
+
         function checkAuthStatus() {
             const user = auth.currentUser;
             updateNavbarUI(user);
@@ -238,7 +320,6 @@
             const navImg = document.getElementById('nav-profile-img');
             
             if (user) {
-                // 1. Admin Login (เช็ค Email)
                 if (userImagesMap[user.email]) {
                     navImg.src = userImagesMap[user.email];
                 } else if (adminProfileImage) {
@@ -248,13 +329,10 @@
                 }
                 navImg.style.borderColor = "#00d2ff";
             } else {
-                // 2. Guest (เช็ค Group Code)
                 if (currentAccessGroup !== 'public' && userImagesMap[currentAccessGroup]) {
-                    // ถ้าใส่รหัสลับ แล้วกลุ่มนั้นมีรูป -> ใช้รูปกลุ่ม
                     navImg.src = userImagesMap[currentAccessGroup];
-                    navImg.style.borderColor = "#ffbd00"; // สีทอง
+                    navImg.style.borderColor = "#ffbd00";
                 } else {
-                    // Guest ทั่วไป
                     navImg.src = "https://cdn-icons-png.flaticon.com/512/149/149071.png"; 
                     navImg.style.borderColor = "rgba(255,255,255,0.2)";
                 }
@@ -304,21 +382,19 @@
 
         function handleUnlock() {
             if (currentAccessGroup !== 'public') {
-                // Logout
                 currentAccessGroup = 'public';
                 alert("🔒 ล็อคระบบแล้ว");
                 document.getElementById('unlockBtn').classList.remove('active');
                 document.getElementById('unlockBtn').innerHTML = '<i class="fas fa-lock"></i>';
-                updateNavbarUI(null); // รีเซ็ตรูป Navbar กลับเป็น Guest
+                updateNavbarUI(null);
                 loadData();
             } else {
-                // Login
                 const input = prompt("🔑 กรุณาใส่รหัสผ่านเข้าถึง:");
                 if (input && accessRules[input]) {
                     currentAccessGroup = accessRules[input];
                     document.getElementById('unlockBtn').classList.add('active');
                     document.getElementById('unlockBtn').innerHTML = '<i class="fas fa-unlock"></i>';
-                    updateNavbarUI(null); // อัปเดตรูป Navbar ตามกลุ่มใหม่
+                    updateNavbarUI(null);
                     loadData();
                 } else if (input) {
                     alert("❌ รหัสไม่ถูกต้อง");
