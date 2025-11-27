@@ -45,18 +45,18 @@
         .nav-logo i { color: var(--accent); }
         .nav-logo span { background: linear-gradient(90deg, #fff, var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
-        /* Menu Links (Apps & About) */
+        /* Menu Links */
         .menu-link {
             color: rgba(255,255,255,0.8); cursor: pointer; font-size: 0.9rem; font-weight: 500;
             padding: 8px 10px; border-radius: 8px; transition: 0.3s; display: flex; align-items: center; gap: 5px;
-            text-decoration: none;
+            text-decoration: none; user-select: none;
         }
         .menu-link:hover, .menu-link.active { background: rgba(255,255,255,0.15); color: #fff; }
 
         /* Dropdown */
         .dropdown { position: relative; display: inline-block; }
         .dropdown-content {
-            display: none; position: absolute; top: 100%; left: 0; margin-top: 2px;
+            display: none; position: absolute; top: 100%; left: 0; margin-top: 5px;
             background-color: #1e1e2f; min-width: 180px; box-shadow: 0 8px 25px rgba(0,0,0,0.6); 
             border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); overflow: hidden; z-index: 1001;
         }
@@ -74,23 +74,25 @@
             color: var(--accent); background: rgba(0,0,0,0.3); padding: 4px 8px; border-radius: 6px;
             border: 1px solid rgba(0, 210, 255, 0.3); white-space: nowrap;
         }
+        .nav-user-container { cursor: pointer; }
         .nav-profile-img {
             width: 34px; height: 34px; border-radius: 50%;
             border: 2px solid rgba(255,255,255,0.2);
-            object-fit: cover; cursor: pointer; transition: transform 0.3s; background: #fff;
+            object-fit: cover; transition: transform 0.3s; background: #fff;
         }
+        .nav-profile-img:hover { transform: scale(1.1); border-color: var(--accent); }
 
         /* Content Styles */
         .profile-section { text-align: center; margin-bottom: 20px; animation: fadeIn 0.8s ease; }
         .profile-img {
             width: 110px; height: 110px; border-radius: 50%;
             border: 3px solid var(--accent); padding: 4px; object-fit: cover;
-            margin-bottom: 15px; box-shadow: 0 0 30px rgba(0, 210, 255, 0.3);
+            margin-bottom: 15px; box-shadow: 0 0 30px rgba(0, 210, 255, 0.3); background: #fff;
         }
         h1 { margin: 0; font-size: 1.6rem; font-weight: 600; }
         p.bio { opacity: 0.7; margin-top: 5px; font-weight: 300; font-size: 0.9rem; }
 
-        /* --- Search Bar (New) --- */
+        /* Search Bar */
         .search-container {
             width: 90%; max-width: 500px; margin-bottom: 20px; position: relative;
         }
@@ -106,7 +108,7 @@
         .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); background: #000; }
         .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 12px; }
 
-        .container { width: 95%; max-width: 500px; padding-bottom: 60px; display: flex; flex-direction: column; gap: 12px; }
+        .container { width: 95%; max-width: 500px; padding-bottom: 40px; display: flex; flex-direction: column; gap: 12px; }
         
         .link-card {
             background: var(--card-bg); backdrop-filter: blur(10px); padding: 15px 20px;
@@ -136,7 +138,19 @@
         }
         .unlock-btn.active { color: #00d2ff; border-color: #00d2ff; background: rgba(0, 210, 255, 0.1); }
         
-        /* --- Modal (About) --- */
+        /* Admin Link (กู้คืนแล้ว) */
+        .admin-link { 
+            margin-top: 10px; 
+            margin-bottom: 30px;
+            color: rgba(255,255,255,0.3); 
+            text-decoration: none; 
+            font-size: 0.85rem; 
+            display: flex; align-items: center; gap: 5px;
+            transition: 0.3s;
+        }
+        .admin-link:hover { color: var(--accent); }
+
+        /* Modal */
         .modal {
             display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%;
             background-color: rgba(0,0,0,0.8); backdrop-filter: blur(5px); justify-content: center; align-items: center;
@@ -147,7 +161,6 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.5); animation: zoomIn 0.3s ease;
         }
         @keyframes zoomIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-        
         .close-modal { position: absolute; top: 15px; right: 15px; color: #aaa; cursor: pointer; font-size: 1.5rem; }
         .modal h2 { color: var(--accent); margin-top: 0; }
         .modal p { color: #ddd; line-height: 1.6; text-align: left; white-space: pre-wrap; }
@@ -184,12 +197,16 @@
         <div class="nav-right">
             <div class="nav-clock" id="nav-clock">00:00</div>
             <div class="nav-user-container" onclick="window.location.href='admin.html'">
-                <img id="nav-profile-img" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" class="nav-profile-img" alt="User">
+                <img id="nav-profile-img" src="https://ui-avatars.com/api/?name=Guest" class="nav-profile-img" alt="User" onerror="this.src='https://ui-avatars.com/api/?name=Guest&background=random'">
             </div>
         </div>
     </nav>
 
-    <div class="profile-section" id="profile-section"></div>
+    <div class="profile-section" id="profile-section">
+        <img src="" class="profile-img" id="main-profile-img" onerror="this.src='https://ui-avatars.com/api/?name=User&background=random'">
+        <h1 id="profile-name">...</h1>
+        <p class="bio" id="profile-bio">...</p>
+    </div>
 
     <div class="search-container">
         <i class="fas fa-search search-icon"></i>
@@ -205,6 +222,10 @@
     <div class="container" id="links-container">
         <div style="text-align: center; opacity: 0.5;">กำลังโหลด...</div>
     </div>
+
+    <a href="admin.html" class="admin-link">
+        <i class="fas fa-cog"></i> จัดการหลังบ้าน
+    </a>
 
     <div id="about-modal" class="modal">
         <div class="modal-content">
@@ -242,7 +263,7 @@
         let adminProfileImage = '';
         let userImagesMap = {};
         let aboutTextContent = '';
-        let globalAllLinks = []; // เก็บลิงก์ทั้งหมดไว้เพื่อ Search
+        let globalAllLinks = [];
 
         // --- Dropdown ---
         function toggleDropdown() {
@@ -267,18 +288,16 @@
         function closeAbout() {
             document.getElementById('about-modal').style.display = "none";
         }
-        // ปิดเมื่อกดพื้นหลัง
         window.addEventListener('click', function(event) {
             const modal = document.getElementById('about-modal');
             if (event.target == modal) modal.style.display = "none";
         });
 
-        // --- Search Logic ---
+        // --- Search ---
         function searchLinks() {
             const term = document.getElementById('search-input').value.toLowerCase();
-            // กรองจาก globalAllLinks ที่โหลดมาแล้ว
             const filtered = globalAllLinks.filter(link => link.title.toLowerCase().includes(term));
-            renderLinks(filtered); // เรียกฟังก์ชัน render ใหม่ด้วยข้อมูลที่กรองแล้ว
+            renderLinks(filtered);
         }
 
         // --- Clock ---
@@ -298,7 +317,7 @@
                     renderProfile(data);
                     renderVideo(data.featuredVideo);
                     adminProfileImage = data.navbarAdminImage;
-                    aboutTextContent = data.aboutText; // เก็บค่า About Text
+                    aboutTextContent = data.aboutText;
                     
                     if (data.appsConfig) renderAppsMenu(data.appsConfig);
                     else document.getElementById('apps-dropdown-list').innerHTML = '<a href="#" style="color:#aaa;">ไม่มีแอป</a>';
@@ -327,7 +346,7 @@
             db.collection("links").orderBy("order", "asc").get().then((snapshot) => {
                 globalAllLinks = [];
                 snapshot.forEach(doc => globalAllLinks.push(doc.data()));
-                renderLinks(globalAllLinks); // Render ครั้งแรก
+                renderLinks(globalAllLinks);
             });
         }
 
@@ -385,28 +404,42 @@
 
         function updateNavbarUI(user) {
             const navImg = document.getElementById('nav-profile-img');
+            let imgSrc = "https://ui-avatars.com/api/?name=Guest&background=random"; // Default
+
             if (user) {
-                if (userImagesMap[user.email]) navImg.src = userImagesMap[user.email];
-                else if (adminProfileImage) navImg.src = adminProfileImage;
-                else navImg.src = user.photoURL || `https://ui-avatars.com/api/?name=${user.email}&background=random`;
+                // 1. เช็คว่ามีรูปเฉพาะ Email นี้ไหม
+                if (userImagesMap[user.email]) {
+                    imgSrc = userImagesMap[user.email];
+                } 
+                // 2. ถ้าไม่มี ใช้รูป Admin General ที่ตั้งไว้
+                else if (adminProfileImage) {
+                    imgSrc = adminProfileImage;
+                } 
+                // 3. ถ้าไม่มี ใช้รูปจาก Firebase/Avatar
+                else {
+                    imgSrc = user.photoURL || `https://ui-avatars.com/api/?name=${user.email}&background=random`;
+                }
                 navImg.style.borderColor = "#00d2ff";
             } else {
+                // Guest Mode
                 if (currentAccessGroup !== 'public' && userImagesMap[currentAccessGroup]) {
-                    navImg.src = userImagesMap[currentAccessGroup];
+                    imgSrc = userImagesMap[currentAccessGroup];
                     navImg.style.borderColor = "#ffbd00";
                 } else {
-                    navImg.src = "https://cdn-icons-png.flaticon.com/512/149/149071.png"; 
+                    imgSrc = "https://cdn-icons-png.flaticon.com/512/149/149071.png"; 
                     navImg.style.borderColor = "rgba(255,255,255,0.2)";
                 }
             }
+            navImg.src = imgSrc;
         }
 
         function renderProfile(data) {
-            document.getElementById('profile-section').innerHTML = `
-                <img src="${data.imageUrl || 'https://ui-avatars.com/api/?name=User'}" class="profile-img">
-                <h1>${data.name || 'My Links'}</h1>
-                <p class="bio">${data.bio || ''}</p>
-            `;
+            const mainImg = document.getElementById('main-profile-img');
+            // ใช้รูป Default ถ้าไม่มีข้อมูล และใส่ Fallback เผื่อรูปเสีย
+            mainImg.src = data.imageUrl || 'https://ui-avatars.com/api/?name=User&background=random';
+            
+            document.getElementById('profile-name').innerText = data.name || 'My Links';
+            document.getElementById('profile-bio').innerText = data.bio || '';
         }
 
         function renderVideo(url) {
@@ -448,7 +481,7 @@
                 document.getElementById('unlockBtn').classList.remove('active');
                 document.getElementById('unlockBtn').innerHTML = '<i class="fas fa-lock"></i>';
                 updateNavbarUI(null);
-                renderLinks(globalAllLinks); // Reload list
+                renderLinks(globalAllLinks); 
             } else {
                 const input = prompt("🔑 กรุณาใส่รหัสผ่านเข้าถึง:");
                 if (input && accessRules[input]) {
@@ -456,7 +489,7 @@
                     document.getElementById('unlockBtn').classList.add('active');
                     document.getElementById('unlockBtn').innerHTML = '<i class="fas fa-unlock"></i>';
                     updateNavbarUI(null);
-                    renderLinks(globalAllLinks); // Reload list
+                    renderLinks(globalAllLinks); 
                 } else if (input) {
                     alert("❌ รหัสไม่ถูกต้อง");
                 }
