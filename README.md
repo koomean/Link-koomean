@@ -1,4 +1,11 @@
 # Link - koomean
+----------------------------------------------------------
+ลิงค์นี้ไม่ได้รับการปรับปรุงอีกต่อไปโปรดไปที่ลิงค์ใหม่ของเรา
+👉🏻https://koomean.github.io/koomean/
+This link is no longer updated. Please visit our new link.
+👉🏻https://koomean.github.io/koomean/
+14_03_2026
+----------------------------------------------------------
 
 By Gemini 3 Pro _ Host With Firebase by Google
 
@@ -27,3 +34,5 @@ Version 3.3.1 Build L271125.4KM (Fix Application Bar On Nav Bug Not Working on M
 Version 3.4.0 Build L271125.5KM (Add About , Add Search)
 
 Version 3.4.1 Build L271125.6KM (Fix Profile Bug , Improve Performance)
+
+Version 4.0.0 Build 4.0.0 (Move to https://koomean.github.io/koomean/ , Some features have been adjusted for compatibility with the existing website.)
